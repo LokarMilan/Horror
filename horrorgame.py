@@ -27,12 +27,8 @@ player_angle = 0
 enemy_x, enemy_y = 5.5, 5.5
 
 # ---------------- TEXTURE ----------------
-wall_texture = pygame.image.load("wall.jpg").convert()
+wall_texture = pygame.image.load("wall.png").convert()
 tex_width, tex_height = wall_texture.get_size()
-
-floor_texture = pygame.image.load("floor.png").convert()
-# ✅ fix padló (egyszer skálázva)
-floor_surface = pygame.transform.scale(floor_texture, (WIDTH, HEIGHT//2))
 
 # ---------------- SETTINGS ----------------
 FOV = math.pi / 3
@@ -85,7 +81,7 @@ def cast_rays():
 
             if world_map[map_y][map_x] == 1:
                 hit = True
-
+                
         if side == 0:
             dist = (map_x - player_x + (1 - step_x) / 2) / (ray_dir_x + 1e-6)
         else:
@@ -155,8 +151,11 @@ while running:
     clock.tick(60)
     screen.fill((0, 0, 0))
 
-    # ✅ FIX PADLÓ (nincs lag)
-    screen.blit(floor_surface, (0, HEIGHT//2))
+        # ég
+    screen.fill((70, 120, 200))
+
+    # padló
+    pygame.draw.rect(screen, (50, 50, 50), (0, HEIGHT//2, WIDTH, HEIGHT//2))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -167,14 +166,22 @@ while running:
     if keys[pygame.K_w]:
         nx = player_x + move_speed * math.cos(player_angle)
         ny = player_y + move_speed * math.sin(player_angle)
-        if can_move(nx, player_y): player_x = nx
-        if can_move(player_x, ny): player_y = ny
+        if not can_move(nx, player_y) or not can_move(player_x, ny):
+            pygame.quit()
+            exit()
+
+        player_x = nx
+        player_y = ny
 
     if keys[pygame.K_s]:
         nx = player_x - move_speed * math.cos(player_angle)
         ny = player_y - move_speed * math.sin(player_angle)
-        if can_move(nx, player_y): player_x = nx
-        if can_move(player_x, ny): player_y = ny
+        if not can_move(nx, player_y) or not can_move(player_x, ny):
+            pygame.quit()
+            exit()
+
+        player_x = nx
+        player_y = ny
 
     if keys[pygame.K_a]:
         player_angle -= 0.05
