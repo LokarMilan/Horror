@@ -7,6 +7,8 @@ pygame.init()
 WIDTH, HEIGHT = 720, 480
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
+pygame.mouse.set_visible(False)
+pygame.event.set_grab(True)
 
 # ---------------- MAP ----------------
 world_map = np.array([
@@ -108,42 +110,7 @@ def cast_rays():
             tex_column,
             (ray, HEIGHT//2 - wall_height//2)
         )
-
-# ---------------- ENEMY ----------------
-def draw_enemy():
-    dx = enemy_x - player_x
-    dy = enemy_y - player_y
-
-    dist = math.sqrt(dx*dx + dy*dy)
-    angle = math.atan2(dy, dx) - player_angle
-
-    while angle > math.pi:
-        angle -= 2*math.pi
-    while angle < -math.pi:
-        angle += 2*math.pi
-
-    if abs(angle) < math.pi/4:
-        screen_x = (angle + math.pi/4) / (math.pi/2) * WIDTH
-        size = 400 / (dist + 0.1)
-
-        pygame.draw.rect(
-            screen,
-            (255, 0, 0),
-            (screen_x - size//2, HEIGHT//2 - size//2, size, size)
-        )
-
-# ---------------- ENEMY AI ----------------
-def move_enemy():
-    global enemy_x, enemy_y
-
-    dx = player_x - enemy_x
-    dy = player_y - enemy_y
-    dist = math.sqrt(dx*dx + dy*dy)
-
-    if dist > 0.1:
-        enemy_x += dx / dist * 0.02
-        enemy_y += dy / dist * 0.02
-
+        
 # ---------------- GAME LOOP ----------------
 running = True
 
@@ -160,6 +127,15 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+    center_x = WIDTH // 2
+
+    dx = mouse_x - center_x
+
+    player_angle += dx * 0.0005
+
+    pygame.mouse.set_pos((center_x, HEIGHT // 2))
 
     keys = pygame.key.get_pressed()
 
@@ -183,16 +159,20 @@ while running:
         player_x = nx
         player_y = ny
 
-    if keys[pygame.K_a]:
-        player_angle -= 0.05
-
     if keys[pygame.K_d]:
-        player_angle += 0.05
+        nx = player_x - move_speed * math.sin(player_angle)
+        ny = player_y + move_speed * math.cos(player_angle)
+        if can_move(nx, player_y): player_x = nx
+        if can_move(player_x, ny): player_y = ny
+
+    if keys[pygame.K_a]:
+        nx = player_x + move_speed * math.sin(player_angle)
+        ny = player_y - move_speed * math.cos(player_angle)
+        if can_move(nx, player_y): player_x = nx
+        if can_move(player_x, ny): player_y = ny
 
     # -------- RENDER --------
     cast_rays()
-    draw_enemy()
-    move_enemy()
 
     pygame.display.flip()
 
