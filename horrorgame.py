@@ -3,6 +3,13 @@ import numpy as np
 import math
 
 pygame.init()
+pygame.font.init()
+font =pygame.font.SysFont("arial",50)
+
+game_state = "menu"
+menu_options = ["singleplayer","multiplayer","exit"]
+selected=0
+
 
 WIDTH, HEIGHT = 720, 480
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -123,63 +130,98 @@ running = True
 
 while running:
     clock.tick(60)
-    screen.fill((0, 0, 0))
 
-        # ég
-    screen.fill((70, 120, 200))
-
-    # padló
-    pygame.draw.rect(screen, (50, 50, 50), (0, HEIGHT//2, WIDTH, HEIGHT//2))
-
+    # ---------------- EVENT ----------------
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    mouse_x, mouse_y = pygame.mouse.get_pos()
-    center_x = WIDTH // 2
+        if game_state == "menu":
 
-    dx = mouse_x - center_x
+            if event.type == pygame.KEYDOWN:
 
-    player_angle += dx * 0.0005
+                if event.key == pygame.K_UP:
+                    selected -= 1
 
-    pygame.mouse.set_pos((center_x, HEIGHT // 2))
+                if event.key == pygame.K_DOWN:
+                    selected += 1
 
-    keys = pygame.key.get_pressed()
+                if event.key == pygame.K_RETURN:
 
-    if keys[pygame.K_w]:
-        nx = player_x + move_speed * math.cos(player_angle)
-        ny = player_y + move_speed * math.sin(player_angle)
-        if not can_move(nx, player_y) or not can_move(player_x, ny):
-            pygame.quit()
-            exit()
+                    if selected == 0:
+                        game_state = "game"
 
-        player_x = nx
-        player_y = ny
+                    elif selected == 1:
+                        game_state = "multiplayer"
 
-    if keys[pygame.K_s]:
-        nx = player_x - move_speed * math.cos(player_angle)
-        ny = player_y - move_speed * math.sin(player_angle)
-        if not can_move(nx, player_y) or not can_move(player_x, ny):
-            pygame.quit()
-            exit()
+                    elif selected == 2:
+                        running = False
 
-        player_x = nx
-        player_y = ny
+    # ---------------- LOGIKA ----------------
+    if game_state == "menu":
 
-    if keys[pygame.K_d]:
-        nx = player_x - move_speed * math.sin(player_angle)
-        ny = player_y + move_speed * math.cos(player_angle)
-        if can_move(nx, player_y): player_x = nx
-        if can_move(player_x, ny): player_y = ny
+        if selected < 0:
+            selected = len(menu_options) - 1
 
-    if keys[pygame.K_a]:
-        nx = player_x + move_speed * math.sin(player_angle)
-        ny = player_y - move_speed * math.cos(player_angle)
-        if can_move(nx, player_y): player_x = nx
-        if can_move(player_x, ny): player_y = ny
+        if selected >= len(menu_options):
+            selected = 0
 
-    # -------- RENDER --------
-    cast_rays()
+    # ---------------- GAME ----------------
+    if game_state == "game":
+
+        mouse_x, _ = pygame.mouse.get_pos()
+        center_x = WIDTH // 2
+
+        dx = mouse_x - center_x
+        player_angle += dx * 0.002
+
+        pygame.mouse.set_pos((center_x, HEIGHT // 2))
+
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_w]:
+            nx = player_x + move_speed * math.cos(player_angle)
+            ny = player_y + move_speed * math.sin(player_angle)
+            if can_move(nx, player_y): player_x = nx
+            if can_move(player_x, ny): player_y = ny
+
+        if keys[pygame.K_s]:
+            nx = player_x - move_speed * math.cos(player_angle)
+            ny = player_y - move_speed * math.sin(player_angle)
+            if can_move(nx, player_y): player_x = nx
+            if can_move(player_x, ny): player_y = ny
+
+        if keys[pygame.K_a]:
+            nx = player_x + move_speed * math.sin(player_angle)
+            ny = player_y - move_speed * math.cos(player_angle)
+            if can_move(nx, player_y): player_x = nx
+            if can_move(player_x, ny): player_y = ny
+
+        if keys[pygame.K_d]:
+            nx = player_x - move_speed * math.sin(player_angle)
+            ny = player_y + move_speed * math.cos(player_angle)
+            if can_move(nx, player_y): player_x = nx
+            if can_move(player_x, ny): player_y = ny
+
+    # ---------------- RENDER ----------------
+    screen.fill((0, 0, 0))
+
+    if game_state == "menu":
+
+        for i, option in enumerate(menu_options):
+
+            color = (255, 255, 255)
+            if i == selected:
+                color = (255, 255, 0)
+
+            text = font.render(option, True, color)
+            screen.blit(text, (WIDTH//2 - 100, HEIGHT//2 + i * 40))
+
+    elif game_state == "game":
+
+        screen.fill((70, 120, 200))
+        pygame.draw.rect(screen, (50, 50, 50), (0, HEIGHT//2, WIDTH, HEIGHT//2))
+        cast_rays()
 
     pygame.display.flip()
 
