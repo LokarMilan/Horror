@@ -152,25 +152,27 @@ def draw_enemy():
     # normalize angle
     angle = (angle + math.pi) % (2 * math.pi) - math.pi
 
-    # ha nincs a látómezőben
+    # FOV check
     if abs(angle) > math.pi / 4:
         return
 
-    # screen pozíció (stabilabb)
-    screen_x = (angle / (math.pi / 4)) * (WIDTH / 2) + WIDTH / 2
+    # screen pozíció
+    screen_x = int((angle / (math.pi / 4)) * (WIDTH / 2) + WIDTH / 2)
 
-    size = min(800 / (dist + 0.1), HEIGHT)
+    if screen_x < 0 or screen_x >= WIDTH:
+        return
 
-        # sprite méret
-    size = int(size)
+    if dist > z_buffer[screen_x]:
+        return
 
-    # kép méretezés
+    # méret
+    size = int(min(800 / (dist + 0.1), HEIGHT))
+
     sprite = pygame.transform.scale(enemy_img, (size, size))
 
-    # kirajzolás
     screen.blit(
         sprite,
-        (int(screen_x - size/2), int(HEIGHT/2 - size/2))
+        (screen_x - size // 2, HEIGHT // 2 - size // 2)
     )
 # ---------------- GAME LOOP ----------------
 running = True
