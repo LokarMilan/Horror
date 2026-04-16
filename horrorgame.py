@@ -178,7 +178,9 @@ while running:
         pygame.mouse.set_pos((center_x, HEIGHT // 2))
 
         keys = pygame.key.get_pressed()
-
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                game_state = "menu"
         if keys[pygame.K_w]:
             nx = player_x + move_speed * math.cos(player_angle)
             ny = player_y + move_speed * math.sin(player_angle)
