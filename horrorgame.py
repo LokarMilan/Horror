@@ -42,9 +42,14 @@ world_map = np.array([
 # ---------------- PLAYER ----------------
 player_x, player_y = 6, 16.5
 player_angle = 250
+
+
+enemy_x, enemy_y = 3, 15
+
 # ---------------- TEXTURE ----------------
 wall_texture = pygame.image.load("wall.png").convert()
 tex_width, tex_height = wall_texture.get_size()
+enemy_img = pygame.image.load("ghost.png").convert_alpha()
 
 # ---------------- SETTINGS ----------------
 FOV = math.pi / 3
@@ -56,7 +61,10 @@ def can_move(x, y):
 
 # ---------------- RAYCAST ----------------
 def cast_rays():
+    global z_buffer
+    z_buffer =[float("inf")] * WIDTH
     for ray in range(WIDTH):
+       
         camera_x = 2 * ray / WIDTH - 1
 
         ray_dir_x = math.cos(player_angle) + camera_x * math.cos(player_angle + math.pi/2)
@@ -124,7 +132,44 @@ def cast_rays():
             tex_column,
             (ray, HEIGHT//2 - wall_height//2)
         )
-        
+        z_buffer[ray] = dist
+
+def draw_enemy():
+    # world -> camera relatív pozíció
+    dx = enemy_x - player_x
+    dy = enemy_y - player_y
+
+    sin_a = math.sin(player_angle)
+    cos_a = math.cos(player_angle)
+
+    # camera space
+    rel_x = dx * cos_a + dy * sin_a
+    rel_y = -dx * sin_a + dy * cos_a
+
+    # mögötted van
+    if rel_y <= 0.1:
+        return
+
+    # FIX: stabil screen mapping
+    screen_x = int(WIDTH / 2 + (rel_x / rel_y) * (WIDTH / 2))
+
+    # offscreen check
+    if screen_x < 0 or screen_x >= WIDTH:
+        return
+
+    # depth check
+    if rel_y >= z_buffer[screen_x]:
+        return
+
+    size = int(HEIGHT / rel_y)
+    size = max(10, min(300, size))
+
+    sprite = pygame.transform.scale(enemy_img, (size, size))
+
+    screen.blit(
+        sprite,
+        (screen_x - size // 2, HEIGHT // 2 - size // 2)
+    )
 # ---------------- GAME LOOP ----------------
 running = True
 
@@ -156,6 +201,10 @@ while running:
 
                     elif selected == 2:
                         running = False
+        elif game_state == "game":
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    game_state = "menu"
 
     # ---------------- LOGIKA ----------------
     if game_state == "menu":
@@ -178,9 +227,7 @@ while running:
         pygame.mouse.set_pos((center_x, HEIGHT // 2))
 
         keys = pygame.key.get_pressed()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                game_state = "menu"
+        
         if keys[pygame.K_w]:
             nx = player_x + move_speed * math.cos(player_angle)
             ny = player_y + move_speed * math.sin(player_angle)
@@ -224,6 +271,7 @@ while running:
         screen.fill((70, 120, 200))
         pygame.draw.rect(screen, (50, 50, 50), (0, HEIGHT//2, WIDTH, HEIGHT//2))
         cast_rays()
+        draw_enemy()
 
     pygame.display.flip()
 
