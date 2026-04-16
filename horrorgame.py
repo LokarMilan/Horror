@@ -33,10 +33,8 @@ world_map = np.array([
 ])
 
 # ---------------- PLAYER ----------------
-player_x, player_y = 6.5, 16.5
-player_angle = 0
-
-
+player_x, player_y = 6, 16.5
+player_angle = 250
 # ---------------- TEXTURE ----------------
 wall_texture = pygame.image.load("wall.png").convert()
 tex_width, tex_height = wall_texture.get_size()
