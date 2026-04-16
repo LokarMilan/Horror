@@ -11,7 +11,7 @@ menu_options = ["singleplayer","multiplayer","exit"]
 selected=0
 
 
-WIDTH, HEIGHT = 720, 480
+WIDTH, HEIGHT = 720,480
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 pygame.mouse.set_visible(False)
@@ -56,8 +56,15 @@ FOV = math.pi / 3
 move_speed = 0.05
 
 # ---------------- COLLISION ----------------
+PLAYER_RADIUS = 0.2
 def can_move(x, y):
-    return world_map[int(y)][int(x)] == 0
+    return (
+        world_map[int(y)][int(x)] == 0 and
+        world_map[int(y + PLAYER_RADIUS)][int(x)] == 0 and
+        world_map[int(y - PLAYER_RADIUS)][int(x)] == 0 and
+        world_map[int(y)][int(x + PLAYER_RADIUS)] == 0 and
+        world_map[int(y)][int(x - PLAYER_RADIUS)] == 0
+    )
 
 # ---------------- RAYCAST ----------------
 def cast_rays():
@@ -111,7 +118,7 @@ def cast_rays():
         else:
             dist = (map_y - player_y + (1 - step_y) / 2) / (ray_dir_y + 1e-6)
 
-        dist = max(dist, 0.0001)
+        dist = max(dist, 0.01)
 
         if side == 0:
             wall_x = player_y + dist * ray_dir_y
@@ -135,40 +142,35 @@ def cast_rays():
         z_buffer[ray] = dist
 
 def draw_enemy():
-    # world -> camera relatív pozíció
     dx = enemy_x - player_x
     dy = enemy_y - player_y
 
-    sin_a = math.sin(player_angle)
-    cos_a = math.cos(player_angle)
+    dist = math.sqrt(dx*dx + dy*dy)
 
-    # camera space
-    rel_x = dx * cos_a + dy * sin_a
-    rel_y = -dx * sin_a + dy * cos_a
+    angle = math.atan2(dy, dx) - player_angle
 
-    # mögötted van
-    if rel_y <= 0.1:
+    # normalize angle
+    angle = (angle + math.pi) % (2 * math.pi) - math.pi
+
+    # ha nincs a látómezőben
+    if abs(angle) > math.pi / 4:
         return
 
-    # FIX: stabil screen mapping
-    screen_x = int(WIDTH / 2 + (rel_x / rel_y) * (WIDTH / 2))
+    # screen pozíció (stabilabb)
+    screen_x = (angle / (math.pi / 4)) * (WIDTH / 2) + WIDTH / 2
 
-    # offscreen check
-    if screen_x < 0 or screen_x >= WIDTH:
-        return
+    size = min(800 / (dist + 0.1), HEIGHT)
 
-    # depth check
-    if rel_y >= z_buffer[screen_x]:
-        return
+        # sprite méret
+    size = int(size)
 
-    size = int(HEIGHT / rel_y)
-    size = max(10, min(300, size))
-
+    # kép méretezés
     sprite = pygame.transform.scale(enemy_img, (size, size))
 
+    # kirajzolás
     screen.blit(
         sprite,
-        (screen_x - size // 2, HEIGHT // 2 - size // 2)
+        (int(screen_x - size/2), int(HEIGHT/2 - size/2))
     )
 # ---------------- GAME LOOP ----------------
 running = True
