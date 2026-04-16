@@ -34,7 +34,7 @@ world_map = np.array([
     [1,0,0,0,1,0,0,1,0,0,0,1],
     [1,1,1,1,1,0,0,1,1,1,1,1],
     [1,0,0,0,1,0,0,1,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,2,0,0,2,0,0,0,1],
     [1,0,0,0,1,0,0,1,0,0,0,1],
     [1,1,1,1,1,1,1,1,1,1,1,1],
 ])
@@ -46,11 +46,14 @@ player_angle = 250
 
 enemy_x, enemy_y = 3, 15
 
+
+doors = {}
+
 # ---------------- TEXTURE ----------------
 wall_texture = pygame.image.load("wall.png").convert()
 tex_width, tex_height = wall_texture.get_size()
 enemy_img = pygame.image.load("ghost.png").convert_alpha()
-
+door_texture = pygame.image.load("door.png").convert()
 # ---------------- SETTINGS ----------------
 FOV = math.pi / 3
 move_speed = 0.05
@@ -110,9 +113,15 @@ def cast_rays():
                 map_y += step_y
                 side = 1
 
-            if world_map[map_y][map_x] == 1:
+            tile = world_map[map_y][map_x]
+
+            if tile == 1:
                 hit = True
-                
+
+            elif tile == 2:
+                if doors.get((map_x, map_y), 0) == 0:
+                    hit = True
+                            
         if side == 0:
             dist = (map_x - player_x + (1 - step_x) / 2) / (ray_dir_x + 1e-6)
         else:
@@ -132,7 +141,12 @@ def cast_rays():
 
         wall_height = int(HEIGHT / (dist + 0.0001))
 
-        tex_column = wall_texture.subsurface((tex_x, 0, 1, tex_height))
+        if tile == 2:
+            texture = door_texture
+        else:
+            texture = wall_texture
+
+        tex_column = texture.subsurface((tex_x, 0, 1, tex_height))
         tex_column = pygame.transform.scale(tex_column, (1, wall_height))
 
         screen.blit(
@@ -209,6 +223,19 @@ while running:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     game_state = "menu"
+        
+        
+                if event.key == pygame.K_e:
+                    front_x = int(player_x + math.cos(player_angle))
+                    front_y = int(player_y + math.sin(player_angle))
+
+                    if world_map[front_y][front_x] == 2:
+                        key = (front_x, front_y)
+
+                        if key not in doors:
+                            doors[key] = 1
+                        else:
+                            doors[key] = 1 - doors[key]
 
     # ---------------- LOGIKA ----------------
     if game_state == "menu":
