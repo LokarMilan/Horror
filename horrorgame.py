@@ -66,6 +66,8 @@ door_texture = pygame.image.load("./img/door.png").convert()
 gun_idle_img = pygame.image.load("./img/gun.png").convert_alpha()
 gun_shoot_img = pygame.image.load("./img/shoot.png").convert_alpha()
 current_gun = gun_idle_img
+wall_w,wall_h = wall_texture.get_size()
+door_w,door_h = door_texture.get_size()
 # ---------------- SETTINGS ----------------
 FOV = math.pi / 3
 move_speed = 0.05
@@ -162,17 +164,24 @@ def cast_rays():
 
         wall_x -= math.floor(wall_x)
 
-        tex_x = int(wall_x * tex_width)
-        tex_x = max(0, min(tex_width - 1, tex_x))
-
-        wall_height = int(HEIGHT / (dist + 0.0001))
-
         if tile == 2:
             texture = door_texture
+            wall_x = (wall_x) % 1.0
         else:
             texture = wall_texture
 
-        tex_column = texture.subsurface((tex_x, 0, 1, tex_height))
+        tex_w = texture.get_width()
+        tex_x = int(wall_x * tex_w)
+
+        tex_x = max(0, min(tex_w - 1, tex_x))
+        if tex_x < 0:
+            tex_x = 0
+        if tex_x >= texture.get_width():
+            tex_x = texture.get_width() - 1
+
+        wall_height = int(HEIGHT / (dist + 0.0001))
+
+        tex_column = texture.subsurface((tex_x, 0, 1, texture.get_height()))
         tex_column = pygame.transform.scale(tex_column, (1, wall_height))
 
         screen.blit(
@@ -223,7 +232,7 @@ def shoot():
     shoot_flash = 5
     gun_state = "shoot"
     gun_timer = 5
-    gun_shake_x = random.randint(-10,10)
+    gun_shake_x = random.randint(-8,8)
     gun_shake_y = random.randint(-10,5)
     if not enemy_alive:
         return
@@ -341,8 +350,8 @@ while running:
         else:
             gun_state = "idle"
         
-        gun_shake_x *= 0.7
-        gun_shake_y *= 0.7
+        gun_shake_x *= 0.85
+        gun_shake_y *= 0.85
 
         mouse_x, _ = pygame.mouse.get_pos()
         center_x = WIDTH // 2
