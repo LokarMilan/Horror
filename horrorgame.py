@@ -11,7 +11,7 @@ game_state = "menu"
 menu_options = ["singleplayer", "multiplayer", "exit"]
 selected = 0
 
-WIDTH, HEIGHT = 720, 480
+WIDTH, HEIGHT = 720,480
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 pygame.mouse.set_visible(False)
@@ -480,7 +480,7 @@ while running:
         else:
             current_gun = gun_idle_img
 
-        scale = 2
+        scale = WIDTH // 400
         gun_scaled = pygame.transform.scale(current_gun, (
         int(current_gun.get_width() * scale), int(current_gun.get_height() * scale)))
 
