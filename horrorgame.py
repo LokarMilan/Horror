@@ -1,6 +1,7 @@
 import pygame
 import numpy as np
 import math
+import random
 
 pygame.init()
 pygame.font.init()
@@ -55,6 +56,8 @@ shoot_flash = 0
 shot = False
 gun_state = "idle"
 gun_timer = 0
+gun_shake_x = 0
+gun_shake_y = 0
 # ---------------- TEXTURE ----------------
 wall_texture = pygame.image.load("./img/wall.png").convert()
 tex_width, tex_height = wall_texture.get_size()
@@ -202,10 +205,12 @@ def draw_enemy():
 
 
 def shoot():
-    global enemy_hp,enemy_alive,shoot_flash,gun_state,gun_timer
+    global enemy_hp,enemy_alive,shoot_flash,gun_state,gun_timer, gun_shake_x, gun_shake_y
     shoot_flash = 5
     gun_state = "shoot"
     gun_timer = 5
+    gun_shake_x = random.randint(-10,10)
+    gun_shake_y = random.randint(-10,5)
     if not enemy_alive:
         return
     dx = enemy_x - player_x
@@ -321,6 +326,9 @@ while running:
             gun_timer -= 1
         else:
             gun_state = "idle"
+        
+        gun_shake_x *= 0.7
+        gun_shake_y *= 0.7
 
         mouse_x, _ = pygame.mouse.get_pos()
         center_x = WIDTH // 2
@@ -379,14 +387,19 @@ while running:
         pygame.draw.line(screen, (255,255,255), (WIDTH//2, HEIGHT//2 - 10), (WIDTH//2, HEIGHT//2 + 10), 2)
         
 
-        gun_x = WIDTH - 2*(current_gun.get_width()//2)
-        gun_y = HEIGHT - current_gun.get_height()
 
         if gun_state == "shoot":
             current_gun = gun_shoot_img
         else:
             current_gun = gun_idle_img
-        screen.blit(current_gun, (gun_x,gun_y))
+
+        scale=2
+        gun_scaled = pygame.transform.scale(current_gun,(int(current_gun.get_width() * scale) , int(current_gun.get_height() * scale)))
+        
+        gun_x = WIDTH - 2*(gun_scaled.get_width()//2) + gun_shake_x
+        gun_y = HEIGHT - gun_scaled.get_height() + gun_shake_y
+
+        screen.blit(gun_scaled, (gun_x,gun_y))
 
 
         if shoot_flash > 0:
