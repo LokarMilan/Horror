@@ -53,12 +53,16 @@ enemy_hp = 100
 enemy_alive = True
 shoot_flash = 0
 shot = False
+gun_state = "idle"
+gun_timer = 0
 # ---------------- TEXTURE ----------------
 wall_texture = pygame.image.load("./img/wall.png").convert()
 tex_width, tex_height = wall_texture.get_size()
 enemy_img = pygame.image.load("./img/ghost.png").convert_alpha()
 door_texture = pygame.image.load("./img/door.png").convert()
-gun_img = pygame.image.load("./img/gun.png").convert_alpha()
+gun_idle_img = pygame.image.load("./img/gun.png").convert_alpha()
+gun_shoot_img = pygame.image.load("./img/shoot.png").convert_alpha()
+current_gun = gun_idle_img
 # ---------------- SETTINGS ----------------
 FOV = math.pi / 3
 move_speed = 0.05
@@ -198,8 +202,10 @@ def draw_enemy():
 
 
 def shoot():
-    global enemy_hp,enemy_alive,shoot_flash,recoil,gun_offset,gun_side
+    global enemy_hp,enemy_alive,shoot_flash,gun_state,gun_timer
     shoot_flash = 5
+    gun_state = "shoot"
+    gun_timer = 5
     if not enemy_alive:
         return
     dx = enemy_x - player_x
@@ -258,9 +264,7 @@ while running:
             running = False
         if event.type ==pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
-                shot = True
                 shoot()
-                shot = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_f:
                 melee_attack()
@@ -311,9 +315,12 @@ while running:
 
         if selected >= len(menu_options):
             selected = 0
-
     # ---------------- GAME ----------------
     if game_state == "game":
+        if gun_timer > 0:
+            gun_timer -= 1
+        else:
+            gun_state = "idle"
 
         mouse_x, _ = pygame.mouse.get_pos()
         center_x = WIDTH // 2
@@ -372,17 +379,19 @@ while running:
         pygame.draw.line(screen, (255,255,255), (WIDTH//2, HEIGHT//2 - 10), (WIDTH//2, HEIGHT//2 + 10), 2)
         
 
-        gun_x = WIDTH - 2*(gun_img.get_width()//2)
-        gun_y = HEIGHT - gun_img.get_height()
+        gun_x = WIDTH - 2*(current_gun.get_width()//2)
+        gun_y = HEIGHT - current_gun.get_height()
 
-        screen.blit(gun_img, (gun_x, gun_y))
+        if gun_state == "shoot":
+            current_gun = gun_shoot_img
+        else:
+            current_gun = gun_idle_img
+        screen.blit(current_gun, (gun_x,gun_y))
 
 
         if shoot_flash > 0:
             pygame.draw.circle(screen,(255,255,255),(WIDTH//2,HEIGHT//2),8)
             shoot_flash -=1
-        if shot:
-            screen.blit(gun_img, (gun_x, gun_y))
 
     pygame.display.flip()
 
