@@ -72,13 +72,27 @@ move_speed = 0.05
 
 # ---------------- COLLISION ----------------
 PLAYER_RADIUS = 0.2
+def is_walkable(x, y):
+    tile = world_map[int(y)][int(x)]
+
+    # sima üres hely
+    if tile == 0:
+        return True
+
+    # ajtó és nyitva van
+    if tile == 2:
+        return doors.get((int(x), int(y)), 0) == 1
+
+    return False
+
+
 def can_move(x, y):
     return (
-        world_map[int(y)][int(x)] == 0 and
-        world_map[int(y + PLAYER_RADIUS)][int(x)] == 0 and
-        world_map[int(y - PLAYER_RADIUS)][int(x)] == 0 and
-        world_map[int(y)][int(x + PLAYER_RADIUS)] == 0 and
-        world_map[int(y)][int(x - PLAYER_RADIUS)] == 0
+        is_walkable(x, y) and
+        is_walkable(x + PLAYER_RADIUS, y) and
+        is_walkable(x - PLAYER_RADIUS, y) and
+        is_walkable(x, y + PLAYER_RADIUS) and
+        is_walkable(x, y - PLAYER_RADIUS)
     )
 
 # ---------------- RAYCAST ----------------
