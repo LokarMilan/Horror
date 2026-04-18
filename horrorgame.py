@@ -24,13 +24,13 @@ world_map = np.array([
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 2, 0, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
+    [1, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 1],
+    [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 1],
     [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
@@ -44,6 +44,9 @@ player_x, player_y = 6, 16.5
 player_angle = 250
 
 enemy_x, enemy_y = 3, 15
+
+
+menu_music = pygame.mixer.Sound("./sound/menu.ogg") 
 
 # doors dict: key = (x, y), value = float 0.0 (closed) to 1.0 (open)
 doors = {}
@@ -457,7 +460,7 @@ while running:
     screen.fill((0, 0, 0))
 
     if game_state == "menu":
-
+        menu_music.play()
         for i, option in enumerate(menu_options):
 
             color = (255, 255, 255)
@@ -468,6 +471,7 @@ while running:
             screen.blit(text, (WIDTH // 2 - 100, HEIGHT // 2 + i * 40))
 
     elif game_state == "game":
+        menu_music.stop()
         screen.fill((70, 120, 200))
         pygame.draw.rect(screen, (50, 50, 50), (0, HEIGHT // 2, WIDTH, HEIGHT // 2))
         cast_rays()
