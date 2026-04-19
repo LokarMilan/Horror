@@ -41,7 +41,7 @@ world_map = np.array([
 
 # ---------------- PLAYER ----------------
 player_x, player_y = 6, 16.5
-player_angle = 250
+player_angle = math.radians(250)
 
 enemy_x, enemy_y = 3, 15
 
@@ -77,6 +77,39 @@ door_w, door_h = door_texture.get_size()
 # ---------------- SETTINGS ----------------
 FOV = math.pi / 3
 move_speed = 0.05
+
+# ---------------- FLASHLIGHT ----------------
+FLASHLIGHT_LENGTH = 225
+FLASHLIGHT_FOV = math.pi / 0.5
+FLASHLIGHT_DARKNESS = 220
+
+def draw_flashlight():
+    dark = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+    dark.fill((0, 0, 0, FLASHLIGHT_DARKNESS))
+
+    light = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+
+    px = WIDTH // 2
+    py = HEIGHT // 2
+
+        # Kúp szélei
+    left_angle = player_angle - FLASHLIGHT_FOV / 2
+    right_angle = player_angle + FLASHLIGHT_FOV / 2
+
+    points = [(px, py)]
+
+    steps = 30
+    for i in range(steps + 1):
+        angle = left_angle + (i / steps) * (right_angle - left_angle)
+        x = px + math.cos(angle) * FLASHLIGHT_LENGTH
+        y = py + math.sin(angle) * FLASHLIGHT_LENGTH
+        points.append((x, y))
+
+
+        # kivágás (SUBTRACT effekt)
+    pygame.draw.polygon(dark, (0, 0, 0, 75), points)
+
+    screen.blit(dark, (0, 0))
 
 # ---------------- COLLISION ----------------
 PLAYER_RADIUS = 0.2
@@ -476,6 +509,7 @@ while running:
         pygame.draw.rect(screen, (50, 50, 50), (0, HEIGHT // 2, WIDTH, HEIGHT // 2))
         cast_rays()
         draw_enemy()
+        draw_flashlight()
         pygame.draw.line(screen, (255, 255, 255), (WIDTH // 2 - 10, HEIGHT // 2), (WIDTH // 2 + 10, HEIGHT // 2), 2)
         pygame.draw.line(screen, (255, 255, 255), (WIDTH // 2, HEIGHT // 2 - 10), (WIDTH // 2, HEIGHT // 2 + 10), 2)
 
