@@ -26,7 +26,7 @@ world_map = np.array([
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 2, 0, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
     [1, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 1],
     [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
@@ -69,7 +69,7 @@ gun_shake_y = 0
 wall_texture = pygame.image.load("./img/wall.png").convert()
 tex_width, tex_height = wall_texture.get_size()
 enemy_img = pygame.image.load("./img/ghost.png").convert_alpha()
-door_texture = pygame.image.load("./img/door.png").convert()
+door_texture = pygame.image.load("./img/wood_door_01.png").convert()
 gun_idle_img = pygame.image.load("./img/gun.png").convert_alpha()
 gun_shoot_img = pygame.image.load("./img/shoot.png").convert_alpha()
 current_gun = gun_idle_img
