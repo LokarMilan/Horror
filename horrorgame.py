@@ -1,3 +1,5 @@
+from email.mime import base
+
 import pygame
 import numpy as np
 import math
@@ -79,38 +81,35 @@ FOV = math.pi / 3
 move_speed = 0.05
 
 # ---------------- FLASHLIGHT ----------------
-FLASHLIGHT_LENGTH = 225
+FLASHLIGHT_LENGTH = 429
 FLASHLIGHT_FOV = math.pi / 0.5
-FLASHLIGHT_DARKNESS = 220
+FLASHLIGHT_DARKNESS = 255
 
 def draw_flashlight():
-    dark = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-    dark.fill((0, 0, 0, FLASHLIGHT_DARKNESS))
+    overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 
-    light = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+    cx, cy = WIDTH // 2, HEIGHT // 2
+    max_radius = FLASHLIGHT_LENGTH
 
-    px = WIDTH // 2
-    py = HEIGHT // 2
+    step = 4  # kisebb = szebb, de lassabb
 
-        # Kúp szélei
-    left_angle = player_angle - FLASHLIGHT_FOV / 2
-    right_angle = player_angle + FLASHLIGHT_FOV / 2
+    for r in range(max_radius, 0, -step):
+        t = r / max_radius
 
-    points = [(px, py)]
+        # itt állítod a sötétedést
+        base = int(255 * (t ** 1.7))
+        boost = int(70 * (1 - t) ** 4)
 
-    steps = 30
-    for i in range(steps + 1):
-        angle = left_angle + (i / steps) * (right_angle - left_angle)
-        x = px + math.cos(angle) * FLASHLIGHT_LENGTH
-        y = py + math.sin(angle) * FLASHLIGHT_LENGTH
-        points.append((x, y))
+        alpha = min(255, base + boost) # középen világos, szélen sötét
 
+        pygame.draw.circle(
+            overlay,
+            (0, 0, 0, alpha),
+            (cx, cy),
+            r
+        )
 
-        # kivágás (SUBTRACT effekt)
-    pygame.draw.polygon(dark, (0, 0, 0, 75), points)
-
-    screen.blit(dark, (0, 0))
-
+    screen.blit(overlay, (0, 0))
 # ---------------- COLLISION ----------------
 PLAYER_RADIUS = 0.2
 
