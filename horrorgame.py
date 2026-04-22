@@ -357,8 +357,8 @@ def shoot():
 
     if not enemy1_alive:
         return
-    dx = enemy1_x - player1_x
-    dy = enemy1_y - player1_y
+    dx = enemy1_x - player_x
+    dy = enemy1_y - player_y
 
     dist = math.sqrt(dx * dx + dy * dy)
 
