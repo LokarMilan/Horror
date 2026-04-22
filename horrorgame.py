@@ -612,9 +612,9 @@ while running:
             shoot_flash -= 1
     if game_state == "multiplayer":
         color = (255, 255, 255)
-        szoveg = "coming soon"
+        szoveg = "coming soon...."
         text = font.render(szoveg, True, color)
-        screen.blit(text, (WIDTH // 2 - 100, HEIGHT // 2 + i * 40))
+        screen.blit(text, (WIDTH // 2-150, HEIGHT // 2))
 
     pygame.display.flip()
 
