@@ -351,34 +351,35 @@ def shoot():
             if enemy_hp <= 0:
                 enemy_alive = False
                 print("ENEMY DEAD")
+    else:
 
-    if enemy1_alive:
-        dx = enemy1_x - player_x
-        dy = enemy1_y - player_y
+        if enemy1_alive:
+            dx = enemy1_x - player_x
+            dy = enemy1_y - player_y
 
-        dist = math.sqrt(dx * dx + dy * dy)
+            dist = math.sqrt(dx * dx + dy * dy)
 
-        angle_to_enemy1 = math.atan2(dy, dx)
-        angle_diff = angle_to_enemy1 - player_angle
+            angle_to_enemy1 = math.atan2(dy, dx)
+            angle_diff = angle_to_enemy1 - player_angle
 
-        angle_diff = (angle_diff + math.pi) % (2 * math.pi) - math.pi
+            angle_diff = (angle_diff + math.pi) % (2 * math.pi) - math.pi
 
-        if abs(angle_diff) < 0.1:
-            ray_x = player_x
-            ray_y = player_y
+            if abs(angle_diff) < 0.1:
+                ray_x = player_x
+                ray_y = player_y
 
-            for i in range(int(dist * 10)):
-                ray_x += math.cos(player_angle) * 0.1
-                ray_y += math.sin(player_angle) * 0.1
+                for i in range(int(dist * 10)):
+                    ray_x += math.cos(player_angle) * 0.1
+                    ray_y += math.sin(player_angle) * 0.1
 
-                if world_map[int(ray_y)][int(ray_x)] == 1:
-                    return
-            enemy1_hp -= 25
-            print("HIT!", enemy1_hp)
+                    if world_map[int(ray_y)][int(ray_x)] == 1:
+                        return
+                enemy1_hp -= 25
+                print("HIT!", enemy1_hp)
 
-            if enemy1_hp <= 0:
-                enemy1_alive = False
-                print("ENEMY DEAD")
+                if enemy1_hp <= 0:
+                    enemy1_alive = False
+                    print("ENEMY DEAD")
 
 
 def melee_attack():
