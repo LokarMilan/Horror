@@ -46,6 +46,7 @@ player_x, player_y = 6, 16.5
 player_angle = math.radians(250)
 
 enemy_x, enemy_y = 3, 15
+enemy1_x, enemy1_y = 9, 15
 
 
 menu_music = pygame.mixer.Sound("./sound/menu.ogg") 
@@ -58,6 +59,8 @@ DOOR_SPEED = 0.03  # how fast the door opens/closes per frame
 
 enemy_hp = 100
 enemy_alive = True
+enemy1_hp = 200
+enemy1_alive = True
 shoot_flash = 0
 shot = False
 gun_state = "idle"
@@ -69,6 +72,7 @@ gun_shake_y = 0
 wall_texture = pygame.image.load("./img/wall.png").convert()
 tex_width, tex_height = wall_texture.get_size()
 enemy_img = pygame.image.load("./img/ghost.png").convert_alpha()
+enemy1_img = pygame.image.load("./img/ZOMBE1.png").convert_alpha()
 door_texture = pygame.image.load("./img/wood_door_01.png").convert()
 gun_idle_img = pygame.image.load("./img/gun.png").convert_alpha()
 gun_shoot_img = pygame.image.load("./img/shoot.png").convert_alpha()
@@ -370,6 +374,124 @@ def melee_attack():
             enemy_alive = False
             print("ENEMY DEAD")
 
+def draw_enemy1():
+    if not enemy1_alive:
+        return
+    dx = enemy1_x - player_x
+    dy = enemy1_y - player_y
+
+    dist = math.sqrt(dx * dx + dy * dy)
+
+    angle = math.atan2(dy, dx) - player_angle
+
+    angle = (angle + math.pi) % (2 * math.pi) - math.pi
+
+    if abs(angle) > math.pi / 4:
+        return
+
+    screen_x = int((angle / (math.pi / 4)) * (WIDTH / 2) + WIDTH / 2)
+
+    if screen_x < 0 or screen_x >= WIDTH:
+        return
+
+    if dist > z_buffer[screen_x]:
+        return
+
+    size = int(min(800 / (dist + 0.1), HEIGHT))
+
+    sprite = pygame.transform.scale(enemy1_img, (size, size))
+
+    screen.blit(
+        sprite,
+        (screen_x - size // 2, HEIGHT // 2 - size // 2)
+    )
+
+
+def shoot1():
+    global enemy1_hp, enemy1_alive, shoot_flash, gun_state, gun_timer, gun_shake_x, gun_shake_y
+    shoot_flash = 5
+    gun_state = "shoot"
+    gun_timer = 5
+    gun_shake_x = random.randint(-8, 8)
+    gun_shake_y = random.randint(-10, 5)
+    if not enemy_alive:
+        return
+    dx = enemy_x - player_x
+    dy = enemy_y - player_y
+
+    dist = math.sqrt(dx * dx + dy * dy)
+
+    angle_to_enemy = math.atan2(dy, dx)
+    angle_diff = angle_to_enemy - player_angle
+
+    angle_diff = (angle_diff + math.pi) % (2 * math.pi) - math.pi
+
+    if abs(angle_diff) < 0.1:
+        ray_x = player_x
+        ray_y = player_y
+
+        for i in range(int(dist * 10)):
+            ray_x += math.cos(player_angle) * 0.1
+            ray_y += math.sin(player_angle) * 0.1
+
+            if world_map[int(ray_y)][int(ray_x)] == 1:
+                return
+        enemy_hp -= 25
+        print("HIT!", enemy_hp)
+
+        if enemy_hp <= 0:
+            enemy_alive = False
+            print("ENEMY DEAD")
+
+
+def melee_attack1():
+    global enemy_hp, enemy_alive
+
+    if not enemy_alive:
+        return
+    dx = enemy_x - player_x
+    dy = enemy_y - player_y
+
+    dist = math.sqrt(dx * dx + dy * dy)
+
+    if dist < 1.5:
+        enemy_hp -= 50
+        print("MELEE HIT", enemy_hp)
+
+        if enemy_hp <= 0:
+            enemy_alive = False
+            print("ENEMY DEAD")
+
+    if not enemy_alive:
+        return
+    dx = enemy_x - player_x
+    dy = enemy_y - player_y
+
+    dist = math.sqrt(dx * dx + dy * dy)
+
+    angle_to_enemy = math.atan2(dy, dx)
+    angle_diff = angle_to_enemy - player_angle
+
+    angle_diff = (angle_diff + math.pi) % (2 * math.pi) - math.pi
+
+    if abs(angle_diff) < 0.1:
+        ray_x = player_x
+        ray_y = player_y
+
+        for i in range(int(dist * 10)):
+            ray_x += math.cos(player_angle) * 0.1
+            ray_y += math.sin(player_angle) * 0.1
+
+            if world_map[int(ray_y)][int(ray_x)] == 1:
+                return
+        enemy_hp -= 25
+        print("HIT!", enemy_hp)
+
+        if enemy_hp <= 0:
+            enemy_alive = False
+            print("ENEMY DEAD")
+
+
 
 # ---------------- GAME LOOP ----------------
 running = True
@@ -508,6 +630,7 @@ while running:
         pygame.draw.rect(screen, (50, 50, 50), (0, HEIGHT // 2, WIDTH, HEIGHT // 2))
         cast_rays()
         draw_enemy()
+        draw_enemy1()
         draw_flashlight()
         pygame.draw.line(screen, (255, 255, 255), (WIDTH // 2 - 10, HEIGHT // 2), (WIDTH // 2 + 10, HEIGHT // 2), 2)
         pygame.draw.line(screen, (255, 255, 255), (WIDTH // 2, HEIGHT // 2 - 10), (WIDTH // 2, HEIGHT // 2 + 10), 2)
