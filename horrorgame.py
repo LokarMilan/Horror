@@ -1,4 +1,3 @@
-from email.mime import base
 
 import pygame
 import numpy as np
@@ -320,82 +319,107 @@ def draw_enemy():
 
 
 def shoot():
-    global enemy_hp, enemy_alive, shoot_flash, gun_state, gun_timer, gun_shake_x, gun_shake_y
+    global enemy_hp, enemy_alive, shoot_flash, gun_state, gun_timer, gun_shake_x, gun_shake_y,enemy1_alive,enemy1_hp
     shoot_flash = 5
     gun_state = "shoot"
     gun_timer = 5
-    gun_shake_x = random.randint(-8, 8)
-    gun_shake_y = random.randint(-10, 5)
-    if not enemy_alive:
-        return
-    dx = enemy_x - player_x
-    dy = enemy_y - player_y
+    gun_shake_x = random.randint(-10, 10)
+    gun_shake_y = random.randint(-15, 10)
+    if enemy_alive:
+        dx = enemy_x - player_x
+        dy = enemy_y - player_y
 
-    dist = math.sqrt(dx * dx + dy * dy)
+        dist = math.sqrt(dx * dx + dy * dy)
 
-    angle_to_enemy = math.atan2(dy, dx)
-    angle_diff = angle_to_enemy - player_angle
+        angle_to_enemy = math.atan2(dy, dx)
+        angle_diff = angle_to_enemy - player_angle
 
-    angle_diff = (angle_diff + math.pi) % (2 * math.pi) - math.pi
+        angle_diff = (angle_diff + math.pi) % (2 * math.pi) - math.pi
 
-    if abs(angle_diff) < 0.1:
-        ray_x = player_x
-        ray_y = player_y
+        if abs(angle_diff) < 0.1:
+            ray_x = player_x
+            ray_y = player_y
 
-        for i in range(int(dist * 10)):
-            ray_x += math.cos(player_angle) * 0.1
-            ray_y += math.sin(player_angle) * 0.1
+            for i in range(int(dist * 10)):
+                ray_x += math.cos(player_angle) * 0.1
+                ray_y += math.sin(player_angle) * 0.1
 
-            if world_map[int(ray_y)][int(ray_x)] == 1:
-                return
-        enemy_hp -= 25
-        print("HIT!", enemy_hp)
+                if world_map[int(ray_y)][int(ray_x)] == 1:
+                    return
+            enemy_hp -= 25
+            print("HIT!", enemy_hp)
 
-        if enemy_hp <= 0:
-            enemy_alive = False
-            print("ENEMY DEAD")
+            if enemy_hp <= 0:
+                enemy_alive = False
+                print("ENEMY DEAD")
 
+<<<<<<< HEAD
     if not enemy1_alive:
         return
     dx = enemy1_x - player_x
     dy = enemy1_y - player_y
+=======
+    if enemy1_alive:
+        dx = enemy1_x - player_x
+        dy = enemy1_y - player_y
+>>>>>>> 4b7185a26ef74533741ef22539d865b048c685fc
 
-    dist = math.sqrt(dx * dx + dy * dy)
+        dist = math.sqrt(dx * dx + dy * dy)
 
-    angle_to_enemy1 = math.atan2(dy, dx)
-    angle_diff = angle_to_enemy1 - player_angle
+        angle_to_enemy1 = math.atan2(dy, dx)
+        angle_diff = angle_to_enemy1 - player_angle
 
-    angle_diff = (angle_diff + math.pi) % (2 * math.pi) - math.pi
+        angle_diff = (angle_diff + math.pi) % (2 * math.pi) - math.pi
 
-    if abs(angle_diff) < 0.1:
-        ray_x = player_x
-        ray_y = player_y
+        if abs(angle_diff) < 0.1:
+            ray_x = player_x
+            ray_y = player_y
 
-        for i in range(int(dist * 10)):
-            ray_x += math.cos(player_angle) * 0.1
-            ray_y += math.sin(player_angle) * 0.1
+            for i in range(int(dist * 10)):
+                ray_x += math.cos(player_angle) * 0.1
+                ray_y += math.sin(player_angle) * 0.1
 
-            if world_map[int(ray_y)][int(ray_x)] == 1:
-                return
+                if world_map[int(ray_y)][int(ray_x)] == 1:
+                    return
+            enemy1_hp -= 25
+            print("HIT!", enemy1_hp)
+
+            if enemy1_hp <= 0:
+                enemy1_alive = False
+                print("ENEMY DEAD")
 
 
 def melee_attack():
-    global enemy_hp, enemy_alive
+    global enemy_hp, enemy_alive,enemy1_hp,enemy1_alive
 
-    if not enemy_alive:
-        return
-    dx = enemy_x - player_x
-    dy = enemy_y - player_y
+    if enemy_alive:
+        dx = enemy_x - player_x
+        dy = enemy_y - player_y
 
-    dist = math.sqrt(dx * dx + dy * dy)
+        dist = math.sqrt(dx * dx + dy * dy)
 
-    if dist < 1.5:
-        enemy_hp -= 50
-        print("MELEE HIT", enemy_hp)
+        if dist < 1.5:
+            enemy_hp -= 50
+            print("MELEE HIT", enemy_hp)
 
-        if enemy_hp <= 0:
-            enemy_alive = False
-            print("ENEMY DEAD")
+            if enemy_hp <= 0:
+                enemy_alive = False
+                print("ENEMY DEAD")
+
+    if enemy1_alive:
+        dx = enemy1_x - player_x
+        dy = enemy1_y - player_y
+
+        dist = math.sqrt(dx * dx + dy * dy)
+
+        if dist < 1.5:
+            enemy1_hp -= 50
+            print("MELEE HIT", enemy1_hp)
+
+            if enemy1_hp <= 0:
+                enemy1_alive = False
+                print("ENEMY DEAD")
+
 
 def draw_enemy1():
     if not enemy1_alive:
@@ -491,6 +515,10 @@ while running:
                             door_states[key] = "opening"
                         elif current_state in ("open", "opening"):
                             door_states[key] = "closing"
+        elif game_state == "multiplayer":
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    game_state = "menu"
 
     # ---------------- LOGIKA ----------------
     if game_state == "menu":
