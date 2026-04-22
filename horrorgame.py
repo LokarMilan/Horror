@@ -1,4 +1,3 @@
-from email.mime import base
 
 import pygame
 import numpy as np
@@ -324,8 +323,8 @@ def shoot():
     shoot_flash = 5
     gun_state = "shoot"
     gun_timer = 5
-    gun_shake_x = random.randint(-8, 8)
-    gun_shake_y = random.randint(-10, 5)
+    gun_shake_x = random.randint(-10, 10)
+    gun_shake_y = random.randint(-15, 10)
     if enemy_alive:
         dx = enemy_x - player_x
         dy = enemy_y - player_y
@@ -384,22 +383,36 @@ def shoot():
 
 
 def melee_attack():
-    global enemy_hp, enemy_alive
+    global enemy_hp, enemy_alive,enemy1_hp,enemy1_alive
 
-    if not enemy_alive:
-        return
-    dx = enemy_x - player_x
-    dy = enemy_y - player_y
+    if enemy_alive:
+        dx = enemy_x - player_x
+        dy = enemy_y - player_y
 
-    dist = math.sqrt(dx * dx + dy * dy)
+        dist = math.sqrt(dx * dx + dy * dy)
 
-    if dist < 1.5:
-        enemy_hp -= 50
-        print("MELEE HIT", enemy_hp)
+        if dist < 1.5:
+            enemy_hp -= 50
+            print("MELEE HIT", enemy_hp)
 
-        if enemy_hp <= 0:
-            enemy_alive = False
-            print("ENEMY DEAD")
+            if enemy_hp <= 0:
+                enemy_alive = False
+                print("ENEMY DEAD")
+
+    if enemy1_alive:
+        dx = enemy1_x - player_x
+        dy = enemy1_y - player_y
+
+        dist = math.sqrt(dx * dx + dy * dy)
+
+        if dist < 1.5:
+            enemy1_hp -= 50
+            print("MELEE HIT", enemy1_hp)
+
+            if enemy1_hp <= 0:
+                enemy1_alive = False
+                print("ENEMY DEAD")
+
 
 def draw_enemy1():
     if not enemy1_alive:
@@ -495,6 +508,10 @@ while running:
                             door_states[key] = "opening"
                         elif current_state in ("open", "opening"):
                             door_states[key] = "closing"
+        elif game_state == "multiplayer":
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    game_state = "menu"
 
     # ---------------- LOGIKA ----------------
     if game_state == "menu":
