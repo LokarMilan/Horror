@@ -352,16 +352,9 @@ def shoot():
                 enemy_alive = False
                 print("ENEMY DEAD")
 
-<<<<<<< HEAD
-    if not enemy1_alive:
-        return
-    dx = enemy1_x - player_x
-    dy = enemy1_y - player_y
-=======
     if enemy1_alive:
         dx = enemy1_x - player_x
         dy = enemy1_y - player_y
->>>>>>> 4b7185a26ef74533741ef22539d865b048c685fc
 
         dist = math.sqrt(dx * dx + dy * dy)
 
@@ -619,8 +612,8 @@ while running:
             shoot_flash -= 1
     if game_state == "multiplayer":
         color = (255, 255, 255)
-
-        text = font.render(option, True, color)
+        szoveg = "coming soon"
+        text = font.render(szoveg, True, color)
         screen.blit(text, (WIDTH // 2 - 100, HEIGHT // 2 + i * 40))
 
     pygame.display.flip()
