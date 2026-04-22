@@ -352,9 +352,16 @@ def shoot():
                 enemy_alive = False
                 print("ENEMY DEAD")
 
+<<<<<<< HEAD
+    if not enemy1_alive:
+        return
+    dx = enemy1_x - player_x
+    dy = enemy1_y - player_y
+=======
     if enemy1_alive:
         dx = enemy1_x - player_x
         dy = enemy1_y - player_y
+>>>>>>> 4b7185a26ef74533741ef22539d865b048c685fc
 
         dist = math.sqrt(dx * dx + dy * dy)
 
