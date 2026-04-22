@@ -1,4 +1,3 @@
-
 import pygame
 import numpy as np
 import math
@@ -611,6 +610,11 @@ while running:
         if shoot_flash > 0:
             pygame.draw.circle(screen, (255, 255, 255), (WIDTH // 2, HEIGHT // 2), 8)
             shoot_flash -= 1
+    if game_state == "multiplayer":
+        color = (255, 255, 255)
+
+        text = font.render(option, True, color)
+        screen.blit(text, (WIDTH // 2 - 100, HEIGHT // 2 + i * 40))
 
     pygame.display.flip()
 
