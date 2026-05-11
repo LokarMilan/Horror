@@ -80,6 +80,7 @@ gun_state = "idle"
 gun_timer = 0
 gun_shake_x = 0
 gun_shake_y = 0
+player_hp=250
 
 # ---------------- TEXTURE ----------------
 wall_texture = pygame.image.load("./img/walli.png").convert()
@@ -834,6 +835,219 @@ def draw_finalenemy():
         sprite,
         (screen_x - size // 2, HEIGHT // 2 - size // 2)
     )
+
+enemy_attack_cooldown = 0
+enemy1_attack_cooldown = 0
+enemy2_attack_cooldown = 0
+enemy3_attack_cooldown = 0
+enemy4_attack_cooldown = 0
+enemy5_attack_cooldown = 0
+finalenemy_attack_cooldown = 0
+enemy_morehp = False
+
+def enemy_attack():
+    global enemy_attack_cooldown,player_hp
+    attack_distance = 1.5  # támadás távolsága
+    damage = 10  # sebzés értéke
+
+    # Csak ha van ellenség élőben
+    if enemy_alive:
+        dx = enemy_x - player_x
+        dy = enemy_y - player_y
+        dist = math.sqrt(dx*dx + dy*dy)
+        if dist < attack_distance:
+            if enemy_attack_cooldown == 0:
+                print("Enemy támad!")
+                loves = random.randint(0,1)
+                if loves == 1:
+                    player_hp -= damage
+                    print(f"Player HP: {player_hp}")
+                    if player_hp <= 0:
+                        print("Game Over!")
+                    enemy_attack_cooldown = 30 
+                    print("Az enemy eltalált!")
+                else:
+                    print("Az enemy nem talált el!")
+    if not enemy_alive:
+        if not enemy_morehp:
+            print("Max HP 300!")
+            player_hp = 300
+            enemy_morehp = True
+            
+    # Csökkentjük a cooldown-t
+    if enemy_attack_cooldown > 0:
+        enemy_attack_cooldown -= 1
+
+def enemy1_attack():
+    global enemy1_attack_cooldown,player_hp
+    attack_distance = 1.5  # támadás távolsága
+    damage = 20  # sebzés értéke
+
+    # Csak ha van ellenség élőben
+    if enemy1_alive:
+        dx = enemy1_x - player_x
+        dy = enemy1_y - player_y
+        dist = math.sqrt(dx*dx + dy*dy)
+        if dist < attack_distance:
+            if enemy1_attack_cooldown == 0:
+                print("Enemy támad!")
+                loves = random.randint(0,1)
+                if loves == 1:
+                    player_hp -= damage
+                    print(f"Player HP: {player_hp}")
+                    if player_hp <= 0:
+                        print("Game Over!")
+                    enemy1_attack_cooldown = 30 
+                    print("Az enemy eltalált!")
+                else:
+                    print("Az enemy nem talált el!")
+    # Csökkentjük a cooldown-t
+    if enemy1_attack_cooldown > 0:
+        enemy1_attack_cooldown -= 1
+
+def enemy2_attack():
+    global enemy2_attack_cooldown,player_hp
+    attack_distance = 1.5  # támadás távolsága
+    damage = 30  # sebzés értéke
+
+    # Csak ha van ellenség élőben
+    if enemy2_alive:
+        dx = enemy2_x - player_x
+        dy = enemy2_y - player_y
+        dist = math.sqrt(dx*dx + dy*dy)
+        if dist < attack_distance:
+            if enemy2_attack_cooldown == 0:
+                print("Enemy támad!")
+                loves = random.randint(0,1)
+                if loves == 1:
+                    player_hp -= damage
+                    print(f"Player HP: {player_hp}")
+                    if player_hp <= 0:
+                        print("Game Over!")
+                    enemy2_attack_cooldown = 30 
+                    print("Az enemy eltalált!")
+                else:
+                    print("Az enemy nem talált el!")
+    # Csökkentjük a cooldown-t
+    if enemy2_attack_cooldown > 0:
+        enemy2_attack_cooldown -= 1
+
+def enemy3_attack():
+    global enemy3_attack_cooldown,player_hp
+    attack_distance = 1.5  # támadás távolsága
+    damage = 40  # sebzés értéke
+
+    # Csak ha van ellenség élőben
+    if enemy3_alive:
+        dx = enemy3_x - player_x
+        dy = enemy3_y - player_y
+        dist = math.sqrt(dx*dx + dy*dy)
+        if dist < attack_distance:
+            if enemy3_attack_cooldown == 0:
+                print("Enemy támad!")
+                loves = random.randint(0,1)
+                if loves == 1:
+                    player_hp -= damage
+                    print(f"Player HP: {player_hp}")
+                    if player_hp <= 0:
+                        print("Game Over!")
+                    enemy3_attack_cooldown = 25
+                    print("Az enemy eltalált!")
+                else:
+                    print("Az enemy nem talált el!")
+    # Csökkentjük a cooldown-t
+    if enemy3_attack_cooldown > 0:
+        enemy3_attack_cooldown -= 1
+
+def enemy4_attack():
+    global enemy4_attack_cooldown,player_hp
+    attack_distance = 1.5  # támadás távolsága
+    damage = 30  # sebzés értéke
+
+    # Csak ha van ellenség élőben
+    if enemy4_alive:
+        dx = enemy4_x - player_x
+        dy = enemy4_y - player_y
+        dist = math.sqrt(dx*dx + dy*dy)
+        if dist < attack_distance:
+            if enemy4_attack_cooldown == 0:
+                print("Enemy támad!")
+                loves = random.randint(0,1)
+                if loves == 1:
+                    player_hp -= damage
+                    print(f"Player HP: {player_hp}")
+                    if player_hp <= 0:
+                        print("Game Over!")
+                    enemy4_attack_cooldown = 30 
+                    print("Az enemy eltalált!")
+                else:
+                    print("Az enemy nem talált el!")
+    # Csökkentjük a cooldown-t
+    if enemy4_attack_cooldown > 0:
+        enemy4_attack_cooldown -= 1
+
+
+def enemy5_attack():
+    global enemy5_attack_cooldown,player_hp
+    attack_distance = 1.5  # támadás távolsága
+    damage = 45  # sebzés értéke
+
+    # Csak ha van ellenség élőben
+    if enemy5_alive:
+        dx = enemy5_x - player_x
+        dy = enemy5_y - player_y
+        dist = math.sqrt(dx*dx + dy*dy)
+        if dist < attack_distance:
+            if enemy5_attack_cooldown == 0:
+                print("Enemy támad!")
+                loves = random.randint(0,1)
+                if loves == 1:
+                    player_hp -= damage
+                    print(f"Player HP: {player_hp}")
+                    if player_hp <= 0:
+                        print("Game Over!")
+                    enemy5_attack_cooldown = 30 
+                    print("Az enemy eltalált!")
+                else:
+                    print("Az enemy nem talált el!")
+    # Csökkentjük a cooldown-t
+    if enemy5_attack_cooldown > 0:
+        enemy5_attack_cooldown -= 1
+
+def finalenemy_attack():
+    global finalenemy_attack_cooldown,player_hp
+    attack_distance = 1.5  # támadás távolsága
+    damage = 60  # sebzés értéke
+
+    # Csak ha van ellenség élőben
+    if finalenemy_alive:
+        dx = finalenemy_x - player_x
+        dy = finalenemy_y - player_y
+        dist = math.sqrt(dx*dx + dy*dy)
+        if dist < attack_distance:
+            if finalenemy_attack_cooldown == 0:
+                print("Enemy támad!")
+                loves = random.randint(0,1)
+                if loves == 1:
+                    player_hp -= damage
+                    print(f"Player HP: {player_hp}")
+                    if player_hp <= 0:
+                        print("Game Over!")
+                    finalenemy_attack_cooldown = 30 
+                    print("Az enemy eltalált!")
+                else:
+                    print("Az enemy nem talált el!")
+    # Csökkentjük a cooldown-t
+    if finalenemy_attack_cooldown > 0:
+        finalenemy_attack_cooldown -= 1
+
+
+
+
+
+
+
+
 # ---------------- GAME LOOP ----------------
 running = True
 
@@ -894,6 +1108,13 @@ while running:
                             door_states[key] = "opening"
                         elif current_state in ("open", "opening"):
                             door_states[key] = "closing"
+            enemy_attack()
+            enemy1_attack()
+            enemy2_attack()
+            enemy3_attack()
+            enemy4_attack()
+            enemy5_attack()
+            finalenemy_attack()
         elif game_state == "multiplayer":
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
