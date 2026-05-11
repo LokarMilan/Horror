@@ -82,7 +82,7 @@ gun_shake_x = 0
 gun_shake_y = 0
 
 # ---------------- TEXTURE ----------------
-wall_texture = pygame.image.load("./img/05muronero.jpg").convert()
+wall_texture = pygame.image.load("./img/walli.png").convert()
 tex_width, tex_height = wall_texture.get_size()
 enemy_img = pygame.image.load("./img/ghost.png").convert_alpha()
 enemy1_img = pygame.image.load("./img/ZOMBE1.png").convert_alpha()
