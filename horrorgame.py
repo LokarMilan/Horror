@@ -844,9 +844,18 @@ enemy4_attack_cooldown = 0
 enemy5_attack_cooldown = 0
 finalenemy_attack_cooldown = 0
 enemy_morehp = False
+enemy1_morehp = False
+enemy2_morehp = False
+enemy3_morehp = False
+enemy4_morehp = False
+enemy5_morehp = False
+
+
+def death():
+    pygame.quit()
 
 def enemy_attack():
-    global enemy_attack_cooldown,player_hp
+    global enemy_attack_cooldown,player_hp,enemy_morehp
     attack_distance = 1.5  # támadás távolsága
     damage = 10  # sebzés értéke
 
@@ -863,6 +872,7 @@ def enemy_attack():
                     player_hp -= damage
                     print(f"Player HP: {player_hp}")
                     if player_hp <= 0:
+                        death()
                         print("Game Over!")
                     enemy_attack_cooldown = 30 
                     print("Az enemy eltalált!")
@@ -879,7 +889,7 @@ def enemy_attack():
         enemy_attack_cooldown -= 1
 
 def enemy1_attack():
-    global enemy1_attack_cooldown,player_hp
+    global enemy1_attack_cooldown,player_hp,enemy1_morehp
     attack_distance = 1.5  # támadás távolsága
     damage = 20  # sebzés értéke
 
@@ -896,17 +906,23 @@ def enemy1_attack():
                     player_hp -= damage
                     print(f"Player HP: {player_hp}")
                     if player_hp <= 0:
+                        death()
                         print("Game Over!")
                     enemy1_attack_cooldown = 30 
                     print("Az enemy eltalált!")
                 else:
                     print("Az enemy nem talált el!")
+    if not enemy1_alive:
+        if not enemy1_morehp:
+            print("Max HP 300!")
+            player_hp = 350
+            enemy1_morehp = True
     # Csökkentjük a cooldown-t
     if enemy1_attack_cooldown > 0:
         enemy1_attack_cooldown -= 1
 
 def enemy2_attack():
-    global enemy2_attack_cooldown,player_hp
+    global enemy2_attack_cooldown,player_hp,enemy1_morehp
     attack_distance = 1.5  # támadás távolsága
     damage = 30  # sebzés értéke
 
@@ -923,17 +939,23 @@ def enemy2_attack():
                     player_hp -= damage
                     print(f"Player HP: {player_hp}")
                     if player_hp <= 0:
+                        death()
                         print("Game Over!")
                     enemy2_attack_cooldown = 30 
                     print("Az enemy eltalált!")
                 else:
                     print("Az enemy nem talált el!")
+    if not enemy2_alive:
+        if not enemy2_morehp:
+            print("Max HP 300!")
+            player_hp = 400
+            enemy2_morehp = True
     # Csökkentjük a cooldown-t
     if enemy2_attack_cooldown > 0:
         enemy2_attack_cooldown -= 1
 
 def enemy3_attack():
-    global enemy3_attack_cooldown,player_hp
+    global enemy3_attack_cooldown,player_hp,enemy3_morehp
     attack_distance = 1.5  # támadás távolsága
     damage = 40  # sebzés értéke
 
@@ -950,17 +972,23 @@ def enemy3_attack():
                     player_hp -= damage
                     print(f"Player HP: {player_hp}")
                     if player_hp <= 0:
+                        death()
                         print("Game Over!")
-                    enemy3_attack_cooldown = 25
+                    enemy3_attack_cooldown = 30 
                     print("Az enemy eltalált!")
                 else:
                     print("Az enemy nem talált el!")
+    if not enemy3_alive:
+        if not enemy3_morehp:
+            print("Max HP 300!")
+            player_hp = 450
+            enemy3_morehp = True
     # Csökkentjük a cooldown-t
     if enemy3_attack_cooldown > 0:
         enemy3_attack_cooldown -= 1
 
 def enemy4_attack():
-    global enemy4_attack_cooldown,player_hp
+    global enemy4_attack_cooldown,player_hp,enemy4_morehp
     attack_distance = 1.5  # támadás távolsága
     damage = 30  # sebzés értéke
 
@@ -977,18 +1005,24 @@ def enemy4_attack():
                     player_hp -= damage
                     print(f"Player HP: {player_hp}")
                     if player_hp <= 0:
+                        death()
                         print("Game Over!")
                     enemy4_attack_cooldown = 30 
                     print("Az enemy eltalált!")
                 else:
                     print("Az enemy nem talált el!")
+    if not enemy4_alive:
+        if not enemy4_morehp:
+            print("Max HP 300!")
+            player_hp = 500
+            enemy4_morehp = True
     # Csökkentjük a cooldown-t
     if enemy4_attack_cooldown > 0:
         enemy4_attack_cooldown -= 1
 
 
 def enemy5_attack():
-    global enemy5_attack_cooldown,player_hp
+    global enemy5_attack_cooldown,player_hp,enemy5_morehp
     attack_distance = 1.5  # támadás távolsága
     damage = 45  # sebzés értéke
 
@@ -1005,11 +1039,17 @@ def enemy5_attack():
                     player_hp -= damage
                     print(f"Player HP: {player_hp}")
                     if player_hp <= 0:
+                        death()
                         print("Game Over!")
                     enemy5_attack_cooldown = 30 
                     print("Az enemy eltalált!")
                 else:
                     print("Az enemy nem talált el!")
+    if not enemy5_alive:
+        if not enemy5_morehp:
+            print("Max HP 300!")
+            player_hp = 550
+            enemy5_morehp = True
     # Csökkentjük a cooldown-t
     if enemy5_attack_cooldown > 0:
         enemy5_attack_cooldown -= 1
@@ -1032,6 +1072,7 @@ def finalenemy_attack():
                     player_hp -= damage
                     print(f"Player HP: {player_hp}")
                     if player_hp <= 0:
+                        death()
                         print("Game Over!")
                     finalenemy_attack_cooldown = 30 
                     print("Az enemy eltalált!")
