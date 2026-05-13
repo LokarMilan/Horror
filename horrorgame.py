@@ -338,7 +338,7 @@ def draw_enemy():
         sprite,
         (screen_x - size // 2, HEIGHT // 2 - size // 2)
     )
-
+    draw_enemy_hp_bar(screen_x, size, enemy_hp, 100)
 
 def shoot():
     global enemy_hp, enemy_alive, shoot_flash, gun_state, gun_timer, gun_shake_x, gun_shake_y,enemy1_alive,enemy1_hp,enemy2_alive,enemy2_hp,enemy3_alive,enemy3_hp,enemy4_alive,enemy4_hp,enemy5_hp, enemy5_alive, finalenemy_hp, finalenemy_alive
@@ -674,10 +674,10 @@ def draw_enemy1():
     sprite = pygame.transform.scale(enemy1_img, (size, size))
 
     screen.blit(
-        sprite,
-        (screen_x - size // 2, HEIGHT // 2 - size // 2)
-    )
-
+    sprite,
+    (screen_x - size // 2, HEIGHT // 2 - size // 2)
+)
+    draw_enemy_hp_bar(screen_x, size, enemy1_hp, 200)
 def draw_enemy2():
     if not enemy2_alive:
         return
@@ -709,6 +709,7 @@ def draw_enemy2():
         sprite,
         (screen_x - size // 2, HEIGHT // 2 - size // 2)
     )
+    draw_enemy_hp_bar(screen_x, size, enemy2_hp, 300)
 
 def draw_enemy3():
     if not enemy3_alive:
@@ -741,7 +742,7 @@ def draw_enemy3():
         sprite,
         (screen_x - size // 2, HEIGHT // 2 - size // 2)
     )
-
+    draw_enemy_hp_bar(screen_x, size, enemy3_hp, 400)
 def draw_enemy4():
     if not enemy4_alive:
         return
@@ -773,7 +774,7 @@ def draw_enemy4():
         sprite,
         (screen_x - size // 2, HEIGHT // 2 - size // 2)
     )
-
+    draw_enemy_hp_bar(screen_x, size, enemy4_hp, 500)
 def draw_enemy5():
     if not enemy5_alive:
         return
@@ -805,7 +806,7 @@ def draw_enemy5():
         sprite,
         (screen_x - size // 2, HEIGHT // 2 - size // 2)
     )
-
+    draw_enemy_hp_bar(screen_x, size, enemy5_hp, 600)
 def draw_finalenemy():
     if not finalenemy_alive:
         return
@@ -837,7 +838,7 @@ def draw_finalenemy():
         sprite,
         (screen_x - size // 2, HEIGHT // 2 - size // 2)
     )
-
+    draw_enemy_hp_bar(screen_x, size, finalenemy_hp, 1000)
 def draw_hp_bar():
     bar_width = 300
     bar_height = 25
@@ -892,6 +893,36 @@ enemy2_morehp = False
 enemy3_morehp = False
 enemy4_morehp = False
 enemy5_morehp = False
+
+def draw_enemy_hp_bar(screen_x, size, hp, max_hp):
+    bar_width = size
+    bar_height = 8
+
+    x = screen_x - bar_width // 2
+    y = HEIGHT // 2 - size // 2 - 18
+
+    # háttér
+    pygame.draw.rect(screen, (60, 60, 60), (x, y, bar_width, bar_height))
+
+    # hp arány
+    hp_ratio = hp / max_hp
+    hp_ratio = max(0, min(1, hp_ratio))
+
+    current_width = int(bar_width * hp_ratio)
+
+    # szín
+    if hp_ratio > 0.6:
+        color = (0, 255, 0)
+    elif hp_ratio > 0.3:
+        color = (255, 165, 0)
+    else:
+        color = (255, 0, 0)
+
+    # hp
+    pygame.draw.rect(screen, color, (x, y, current_width, bar_height))
+
+    # keret
+    pygame.draw.rect(screen, (255, 255, 255), (x, y, bar_width, bar_height), 1)
 
 
 def death():
@@ -1125,6 +1156,8 @@ def finalenemy_attack():
     # Csökkentjük a cooldown-t
     if finalenemy_attack_cooldown > 0:
         finalenemy_attack_cooldown -= 1
+
+
 # ---------------- GAME LOOP ----------------
 running = True
 
