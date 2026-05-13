@@ -81,6 +81,8 @@ gun_timer = 0
 gun_shake_x = 0
 gun_shake_y = 0
 player_hp=250
+player_max_hp = 250
+display_hp = 1000
 
 # ---------------- TEXTURE ----------------
 wall_texture = pygame.image.load("./img/walli.png").convert()
@@ -836,6 +838,47 @@ def draw_finalenemy():
         (screen_x - size // 2, HEIGHT // 2 - size // 2)
     )
 
+def draw_hp_bar():
+    bar_width = 300
+    bar_height = 25
+
+    x = WIDTH // 2 - bar_width // 2
+    y = HEIGHT - 40
+
+    # háttér
+    pygame.draw.rect(screen, (40, 40, 40), (x, y, bar_width, bar_height))
+
+    # hp arány FIX maximumhoz
+    hp_ratio = player_hp / display_hp
+
+    # ne mehessen 100% fölé
+    hp_ratio = min(hp_ratio, 1)
+
+    current_width = int(bar_width * hp_ratio)
+
+    # szín
+    if hp_ratio > 0.6:
+        color = (0, 255, 0)
+    elif hp_ratio > 0.3:
+        color = (255, 165, 0)
+    else:
+        color = (255, 0, 0)
+
+    # hp csík
+    pygame.draw.rect(screen, color, (x, y, current_width, bar_height))
+
+    # keret
+    pygame.draw.rect(screen, (255, 255, 255), (x, y, bar_width, bar_height), 2)
+
+    # kisebb font a hp számhoz
+    hp_font = pygame.font.SysFont("arial", 18, bold=True)
+
+    hp_text = hp_font.render(f"{player_hp} HP", True, (255,255,255))
+
+    text_rect = hp_text.get_rect(center=(x + bar_width // 2, y + bar_height // 2))
+
+    screen.blit(hp_text, text_rect)
+
 enemy_attack_cooldown = 0
 enemy1_attack_cooldown = 0
 enemy2_attack_cooldown = 0
@@ -855,7 +898,7 @@ def death():
     pygame.quit()
 
 def enemy_attack():
-    global enemy_attack_cooldown,player_hp,enemy_morehp
+    global enemy_attack_cooldown,player_hp,player_max_hp,enemy_morehp
     attack_distance = 1.5  # támadás távolsága
     damage = 10  # sebzés értéke
 
@@ -889,7 +932,7 @@ def enemy_attack():
         enemy_attack_cooldown -= 1
 
 def enemy1_attack():
-    global enemy1_attack_cooldown,player_hp,enemy1_morehp
+    global enemy1_attack_cooldown,player_hp,player_max_hp,enemy1_morehp
     attack_distance = 1.5  # támadás távolsága
     damage = 20  # sebzés értéke
 
@@ -915,14 +958,15 @@ def enemy1_attack():
     if not enemy1_alive:
         if not enemy1_morehp:
             print("Max HP 300!")
-            player_hp = 350
+            player_max_hp += 50
+            player_hp += 50
             enemy1_morehp = True
     # Csökkentjük a cooldown-t
     if enemy1_attack_cooldown > 0:
         enemy1_attack_cooldown -= 1
 
 def enemy2_attack():
-    global enemy2_attack_cooldown,player_hp,enemy1_morehp
+    global enemy2_attack_cooldown,player_hp,enemy2_morehp
     attack_distance = 1.5  # támadás távolsága
     damage = 30  # sebzés értéke
 
@@ -955,7 +999,7 @@ def enemy2_attack():
         enemy2_attack_cooldown -= 1
 
 def enemy3_attack():
-    global enemy3_attack_cooldown,player_hp,enemy3_morehp
+    global enemy3_attack_cooldown,player_hp,player_max_hp,enemy3_morehp
     attack_distance = 1.5  # támadás távolsága
     damage = 40  # sebzés értéke
 
@@ -988,7 +1032,7 @@ def enemy3_attack():
         enemy3_attack_cooldown -= 1
 
 def enemy4_attack():
-    global enemy4_attack_cooldown,player_hp,enemy4_morehp
+    global enemy4_attack_cooldown,player_hp,player_max_hp,enemy4_morehp
     attack_distance = 1.5  # támadás távolsága
     damage = 30  # sebzés értéke
 
@@ -1022,7 +1066,7 @@ def enemy4_attack():
 
 
 def enemy5_attack():
-    global enemy5_attack_cooldown,player_hp,enemy5_morehp
+    global enemy5_attack_cooldown,player_hp,player_max_hp,enemy5_morehp
     attack_distance = 1.5  # támadás távolsága
     damage = 45  # sebzés értéke
 
@@ -1055,7 +1099,7 @@ def enemy5_attack():
         enemy5_attack_cooldown -= 1
 
 def finalenemy_attack():
-    global finalenemy_attack_cooldown,player_hp
+    global finalenemy_attack_cooldown,player_max_hp,player_hp
     attack_distance = 1.5  # támadás távolsága
     damage = 60  # sebzés értéke
 
@@ -1081,14 +1125,6 @@ def finalenemy_attack():
     # Csökkentjük a cooldown-t
     if finalenemy_attack_cooldown > 0:
         finalenemy_attack_cooldown -= 1
-
-
-
-
-
-
-
-
 # ---------------- GAME LOOP ----------------
 running = True
 
@@ -1156,6 +1192,7 @@ while running:
             enemy4_attack()
             enemy5_attack()
             finalenemy_attack()
+
         elif game_state == "multiplayer":
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -1244,6 +1281,7 @@ while running:
         draw_enemy5()
         draw_finalenemy()
         draw_flashlight()
+        draw_hp_bar()
         pygame.draw.line(screen, (255, 255, 255), (WIDTH // 2 - 10, HEIGHT // 2), (WIDTH // 2 + 10, HEIGHT // 2), 2)
         pygame.draw.line(screen, (255, 255, 255), (WIDTH // 2, HEIGHT // 2 - 10), (WIDTH // 2, HEIGHT // 2 + 10), 2)
 
