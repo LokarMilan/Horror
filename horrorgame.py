@@ -24,7 +24,7 @@ world_map = np.array([
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
     [1, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 1],
     [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
@@ -97,6 +97,7 @@ finalenemy_img = pygame.image.load("./img/finalboss.png").convert_alpha()
 door_texture = pygame.image.load("./img/wood_door_01.png").convert()
 gun_idle_img = pygame.image.load("./img/gun.png").convert_alpha()
 gun_shoot_img = pygame.image.load("./img/shoot.png").convert_alpha()
+locked_texture = pygame.image.load("./img/wall.png").convert()
 current_gun = gun_idle_img
 wall_w, wall_h = wall_texture.get_size()
 door_w, door_h = door_texture.get_size()
@@ -184,6 +185,22 @@ def update_doors():
 
 
 # ---------------- RAYCAST ----------------
+textures = {
+    1: wall_texture,
+    2: door_texture,
+    3: locked_texture,
+}
+
+locked_walls = {
+    (5, 5): (4, 15),  # 1. ajtó
+    (4, 15): (7, 15), # 2.
+    (7, 15): (4, 11), # 3.
+    (4, 11): (7, 11), # 4.
+    (7, 11): (4, 7),  # 5.
+    (4, 7): (7, 7),   # 6.
+}
+
+
 def cast_rays():
     global z_buffer
     z_buffer = [float("inf")] * WIDTH
@@ -232,7 +249,7 @@ def cast_rays():
 
             tile = world_map[map_y][map_x]
 
-            if tile == 1:
+            if tile in (1,3):
                 hit = True
 
             elif tile == 2:
@@ -286,7 +303,7 @@ def cast_rays():
                 tex_coord = wall_x
             tex_coord = max(0.0, min(1.0, tex_coord))
         else:
-            texture = wall_texture
+            texture = textures.get(tile,wall_texture)
             tex_coord = wall_x
 
         tex_w = texture.get_width()
