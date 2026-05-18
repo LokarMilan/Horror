@@ -24,17 +24,17 @@ world_map = np.array([
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
-    [1, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 1],
-    [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
-    [1, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 1],
+    [1, 0, 0, 0, 3, 0, 0, 2, 0, 0, 0, 1],
     [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
-    [1, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 1],
+    [1, 0, 0, 0, 3, 0, 0, 3, 0, 0, 0, 1],
+    [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
+    [1, 0, 0, 0, 2, 0, 0, 3, 0, 0, 0, 1],
     [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ])
@@ -206,13 +206,54 @@ textures = {
 }
 
 locked_walls = {
-    (5, 5): (4, 15),  # 1. ajtó
-    (4, 15): (7, 15), # 2.
-    (7, 15): (4, 11), # 3.
-    (4, 11): (7, 11), # 4.
-    (7, 11): (4, 7),  # 5.
-    (4, 7): (7, 7),   # 6.
+    "enemy": (5, 5),       # Ha meghal az enemy, az (5,5) koordinátán lévő 3-as ajtó 2-es lesz
+    "enemy1_2": (7, 4),    # Ha enemy1 ÉS enemy2 meghal, a (7,4) ajtó megnyílik
+    "enemy3": (7, 7),      # Stb...
+    "enemy4": (11, 4),
+    "enemy5": (11, 7),
+    "final": (15, 4)       # Az utolsó kapu a boss előtt
 }
+
+def check_locked_doors():
+    global world_map
+    
+    # 1. Első enemy halála -> (5, 5) helyen lévő ajtó megnyílik
+    if not enemy_alive:
+        x, y = locked_walls["enemy"]
+        if world_map[y][x] == 3:
+            world_map[y][x] = 2  # Átváltjuk nyitható ajtóvá
+            print("Az (5,5) ajtó zárja kioldott!")
+
+    # 2. Enemy1 ÉS Enemy2 halála -> (7, 4) ajtó megnyílik
+    if not enemy1_alive and not enemy2_alive:
+        x, y = locked_walls["enemy1_2"]
+        if world_map[y][x] == 3:
+            world_map[y][x] = 2
+            print("A (7,4) ajtó zárja kioldott!")
+
+    # 3. Enemy3 halála -> (7, 7) ajtó megnyílik
+    if not enemy3_alive:
+        x, y = locked_walls["enemy3"]
+        if world_map[y][x] == 3:
+            world_map[y][x] = 2
+
+    # 4. Enemy4 halála -> (11, 4) ajtó megnyílik
+    if not enemy4_alive:
+        x, y = locked_walls["enemy4"]
+        if world_map[y][x] == 3:
+            world_map[y][x] = 2
+
+    # 5. Enemy5 halála -> (11, 7) ajtó megnyílik
+    if not enemy5_alive:
+        x, y = locked_walls["enemy5"]
+        if world_map[y][x] == 3:
+            world_map[y][x] = 2
+
+    # 6. Final boss halála -> (15, 4) ajtó megnyílik
+    if not finalenemy_alive:
+        x, y = locked_walls["final"]
+        if world_map[y][x] == 3:
+            world_map[y][x] = 2
 
 
 def cast_rays():
@@ -1303,6 +1344,27 @@ while running:
 
     # ---------------- GAME ----------------
     if game_state == "game":
+        # ----------------- AJTÓK FELOLDÁSA ELLENSÉGEK ALAPJÁN -----------------
+        # 1. zóna: Sima 'enemy' halála után a középső 3-as ajtó kinyithatóvá válik
+        if not enemy_alive and world_map[5][5] == 3:
+            world_map[5][5] = 2
+            print("Az 1. ajtó feloldva! (3 -> 2)")
+
+        # 2. zóna: Ha enemy1 és enemy2 is halott, az alsóbb ajtók nyílnak
+        if not enemy1_alive and not enemy2_alive:
+            if world_map[7][4] == 3: world_map[7][4] = 2
+            if world_map[7][7] == 3: world_map[7][7] = 2
+
+        # 3. zóna: Ha enemy3 halott
+        if not enemy3_alive:
+            if world_map[11][4] == 3: world_map[11][4] = 2
+            if world_map[11][7] == 3: world_map[11][7] = 2
+
+        # 4. zóna: Ha enemy4 és enemy5 halott
+        if not enemy4_alive and not enemy5_alive:
+            if world_map[15][4] == 3: world_map[15][4] = 2
+            if world_map[15][7] == 3: world_map[15][7] = 2
+        # ----------------------------------------------------------------------
         # Update door animations
         update_doors()
 
@@ -1371,6 +1433,7 @@ while running:
         screen.fill((70, 120, 200))
         pygame.draw.rect(screen, (50, 50, 50), (0, HEIGHT // 2, WIDTH, HEIGHT // 2))
         cast_rays()
+        check_locked_doors()
         draw_enemy()
         draw_enemy1()
         draw_enemy2()
