@@ -926,6 +926,13 @@ enemy4_state = "idle"
 enemy5_state = "idle"
 finalenemy_state= "idle"
 enemy_shoot_timer = 10
+enemy1_shoot_timer = 10
+enemy2_shoot_timer = 10
+enemy3_shoot_timer = 10
+enemy4_shoot_timer = 10
+enemy5_shoot_timer = 10
+finalenemy_shoot_timer = 10
+
 
 def draw_enemy_hp_bar(screen_x, size, hp, max_hp):
     bar_width = size
@@ -999,7 +1006,7 @@ def enemy_attack():
         enemy_attack_cooldown -= 1
 
 def enemy1_attack():
-    global enemy1_attack_cooldown,player_hp,player_max_hp,enemy1_morehp
+    global enemy1_attack_cooldown,player_hp,player_max_hp,enemy1_morehp,enemy1_state,enemy1_shoot_timer
     attack_distance = 1.5  # támadás távolsága
     damage = 20  # sebzés értéke
 
@@ -1010,6 +1017,8 @@ def enemy1_attack():
         dist = math.sqrt(dx*dx + dy*dy)
         if dist < attack_distance:
             if enemy1_attack_cooldown == 0:
+                enemy1_state = "shoot"
+                enemy1_shoot_timer = 10
                 print("Enemy támad!")
                 loves = random.randint(0,1)
                 if loves == 1:
@@ -1033,7 +1042,7 @@ def enemy1_attack():
         enemy1_attack_cooldown -= 1
 
 def enemy2_attack():
-    global enemy2_attack_cooldown,player_hp,enemy2_morehp
+    global enemy2_attack_cooldown,player_hp,enemy2_morehp,enemy2_state,enemy2_shoot_timer
     attack_distance = 1.5  # támadás távolsága
     damage = 30  # sebzés értéke
 
@@ -1044,6 +1053,8 @@ def enemy2_attack():
         dist = math.sqrt(dx*dx + dy*dy)
         if dist < attack_distance:
             if enemy2_attack_cooldown == 0:
+                enemy2_state = "shoot"
+                enemy2_shoot_timer = 10
                 print("Enemy támad!")
                 loves = random.randint(0,1)
                 if loves == 1:
@@ -1066,7 +1077,7 @@ def enemy2_attack():
         enemy2_attack_cooldown -= 1
 
 def enemy3_attack():
-    global enemy3_attack_cooldown,player_hp,player_max_hp,enemy3_morehp
+    global enemy3_attack_cooldown,player_hp,player_max_hp,enemy3_morehp,enemy3_state,enemy3_shoot_timer
     attack_distance = 1.5  # támadás távolsága
     damage = 40  # sebzés értéke
 
@@ -1077,6 +1088,8 @@ def enemy3_attack():
         dist = math.sqrt(dx*dx + dy*dy)
         if dist < attack_distance:
             if enemy3_attack_cooldown == 0:
+                enemy3_state = "shoot"
+                enemy3_shoot_timer = 10
                 print("Enemy támad!")
                 loves = random.randint(0,1)
                 if loves == 1:
@@ -1099,7 +1112,7 @@ def enemy3_attack():
         enemy3_attack_cooldown -= 1
 
 def enemy4_attack():
-    global enemy4_attack_cooldown,player_hp,player_max_hp,enemy4_morehp
+    global enemy4_attack_cooldown,player_hp,player_max_hp,enemy4_morehp,enemy4_state,enemy4_shoot_timer
     attack_distance = 1.5  # támadás távolsága
     damage = 30  # sebzés értéke
 
@@ -1110,6 +1123,8 @@ def enemy4_attack():
         dist = math.sqrt(dx*dx + dy*dy)
         if dist < attack_distance:
             if enemy4_attack_cooldown == 0:
+                enemy4_state = "shoot"
+                enemy4_shoot_timer = 10
                 print("Enemy támad!")
                 loves = random.randint(0,1)
                 if loves == 1:
@@ -1133,7 +1148,7 @@ def enemy4_attack():
 
 
 def enemy5_attack():
-    global enemy5_attack_cooldown,player_hp,player_max_hp,enemy5_morehp
+    global enemy5_attack_cooldown,player_hp,player_max_hp,enemy5_morehp,enemy5_state,enemy5_shoot_timer
     attack_distance = 1.5  # támadás távolsága
     damage = 45  # sebzés értéke
 
@@ -1144,6 +1159,8 @@ def enemy5_attack():
         dist = math.sqrt(dx*dx + dy*dy)
         if dist < attack_distance:
             if enemy5_attack_cooldown == 0:
+                enemy5_state = "shoot"
+                enemy5_shoot_timer = 10
                 print("Enemy támad!")
                 loves = random.randint(0,1)
                 if loves == 1:
@@ -1166,7 +1183,7 @@ def enemy5_attack():
         enemy5_attack_cooldown -= 1
 
 def finalenemy_attack():
-    global finalenemy_attack_cooldown,player_max_hp,player_hp
+    global finalenemy_attack_cooldown,player_max_hp,player_hp,finalenemy_state,finalenemy_shoot_timer
     attack_distance = 1.5  # támadás távolsága
     damage = 60  # sebzés értéke
 
@@ -1177,6 +1194,8 @@ def finalenemy_attack():
         dist = math.sqrt(dx*dx + dy*dy)
         if dist < attack_distance:
             if finalenemy_attack_cooldown == 0:
+                finalenemy_state = "shoot"
+                finalenemy_shoot_timer = 10
                 print("Enemy támad!")
                 loves = random.randint(0,1)
                 if loves == 1:
@@ -1366,6 +1385,31 @@ while running:
             current_enemy = enemy_shoot_img
         else:
             current_enemy = enemy_img
+        if enemy1_state == "shoot":
+            current_enemy1 = enemy1_shoot_img
+        else:
+            current_enemy1 = enemy1_img
+        if enemy2_state == "shoot":
+            current_enemy2 = enemy2_shoot_img
+        else:
+            current_enemy2 = enemy2_img
+        if enemy3_state == "shoot":
+            current_enemy3 = enemy3_shoot_img
+        else:
+            current_enemy3 = enemy3_img
+        if enemy4_state == "shoot":
+            current_enemy4 = enemy4_shoot_img
+        else:
+            current_enemy4 = enemy4_img
+        if enemy5_state == "shoot":
+            current_enemy5 = enemy5_shoot_img
+        else:
+            current_enemy5 = enemy5_img
+        if finalenemy_state == "shoot":
+            current_finalenemy = finalenemy_shoot_img
+        else:
+            current_finalenemy = finalenemy_img
+
 
         scale = WIDTH // 400
         gun_scaled = pygame.transform.scale(current_gun, (
