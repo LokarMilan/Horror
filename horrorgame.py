@@ -85,7 +85,7 @@ player_max_hp = 250
 display_hp = 1000
 
 # ---------------- TEXTURE ----------------
-wall_texture = pygame.image.load("./img/walli.png").convert()
+wall_texture = pygame.image.load("./img/bwall.png").convert()
 tex_width, tex_height = wall_texture.get_size()
 enemy_img = pygame.image.load("./img/ghost.png").convert_alpha()
 enemy1_img = pygame.image.load("./img/ZOMBE1.png").convert_alpha()
