@@ -97,10 +97,18 @@ finalenemy_img = pygame.image.load("./img/finalboss.png").convert_alpha()
 door_texture = pygame.image.load("./img/wood_door_01.png").convert()
 gun_idle_img = pygame.image.load("./img/gun.png").convert_alpha()
 gun_shoot_img = pygame.image.load("./img/shoot.png").convert_alpha()
-locked_texture = pygame.image.load("./img/wall.png").convert()
+locked_texture = pygame.image.load("./img/wall.png").convert_alpha()
 current_gun = gun_idle_img
 wall_w, wall_h = wall_texture.get_size()
 door_w, door_h = door_texture.get_size()
+current_enemy = enemy_img
+current_enemy1 = enemy1_img
+current_enemy2 = enemy2_img
+current_enemy3 = enemy3_img
+current_enemy4 = enemy4_img
+current_enemy5 = enemy5_img
+current_finalenemy = finalenemy_img
+enemy_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
 
 # ---------------- SETTINGS ----------------
 FOV = math.pi / 3
@@ -349,7 +357,7 @@ def draw_enemy():
 
     size = int(min(800 / (dist + 0.1), HEIGHT))
 
-    sprite = pygame.transform.scale(enemy_img, (size, size))
+    sprite = pygame.transform.scale(current_enemy, (size, size))
 
     screen.blit(
         sprite,
@@ -688,7 +696,7 @@ def draw_enemy1():
 
     size = int(min(800 / (dist + 0.1), HEIGHT))
 
-    sprite = pygame.transform.scale(enemy1_img, (size, size))
+    sprite = pygame.transform.scale(current_enemy1, (size, size))
 
     screen.blit(
     sprite,
@@ -720,7 +728,7 @@ def draw_enemy2():
 
     size = int(min(800 / (dist + 0.1), HEIGHT))
 
-    sprite = pygame.transform.scale(enemy2_img, (size, size))
+    sprite = pygame.transform.scale(current_enemy2, (size, size))
 
     screen.blit(
         sprite,
@@ -753,7 +761,7 @@ def draw_enemy3():
 
     size = int(min(800 / (dist + 0.1), HEIGHT))
 
-    sprite = pygame.transform.scale(enemy3_img, (size, size))
+    sprite = pygame.transform.scale(current_enemy3, (size, size))
 
     screen.blit(
         sprite,
@@ -785,7 +793,7 @@ def draw_enemy4():
 
     size = int(min(800 / (dist + 0.1), HEIGHT))
 
-    sprite = pygame.transform.scale(enemy4_img, (size, size))
+    sprite = pygame.transform.scale(current_enemy4, (size, size))
 
     screen.blit(
         sprite,
@@ -817,7 +825,7 @@ def draw_enemy5():
 
     size = int(min(800 / (dist + 0.1), HEIGHT))
 
-    sprite = pygame.transform.scale(enemy5_img, (size, size))
+    sprite = pygame.transform.scale(current_enemy5, (size, size))
 
     screen.blit(
         sprite,
@@ -849,7 +857,7 @@ def draw_finalenemy():
 
     size = int(min(800 / (dist + 0.1), HEIGHT))
 
-    sprite = pygame.transform.scale(finalenemy_img, (size, size))
+    sprite = pygame.transform.scale(current_finalenemy, (size, size))
 
     screen.blit(
         sprite,
@@ -910,6 +918,14 @@ enemy2_morehp = False
 enemy3_morehp = False
 enemy4_morehp = False
 enemy5_morehp = False
+enemy_state = "idle"
+enemy1_state = "idle"
+enemy2_state = "idle"
+enemy3_state = "idle"
+enemy4_state = "idle"
+enemy5_state = "idle"
+finalenemy_state= "idle"
+enemy_shoot_timer = 10
 
 def draw_enemy_hp_bar(screen_x, size, hp, max_hp):
     bar_width = size
@@ -946,7 +962,7 @@ def death():
     pygame.quit()
 
 def enemy_attack():
-    global enemy_attack_cooldown,player_hp,player_max_hp,enemy_morehp
+    global enemy_attack_cooldown,player_hp,player_max_hp,enemy_morehp,enemy_state,enemy_shoot_timer
     attack_distance = 1.5  # támadás távolsága
     damage = 10  # sebzés értéke
 
@@ -956,7 +972,10 @@ def enemy_attack():
         dy = enemy_y - player_y
         dist = math.sqrt(dx*dx + dy*dy)
         if dist < attack_distance:
+            
             if enemy_attack_cooldown == 0:
+                enemy_state = "shoot"
+                enemy_shoot_timer = 10
                 print("Enemy támad!")
                 loves = random.randint(0,1)
                 if loves == 1:
@@ -965,7 +984,7 @@ def enemy_attack():
                     if player_hp <= 0:
                         death()
                         print("Game Over!")
-                    enemy_attack_cooldown = 30 
+                    enemy_attack_cooldown = 90
                     print("Az enemy eltalált!")
                 else:
                     print("Az enemy nem talált el!")
@@ -1303,6 +1322,10 @@ while running:
             ny = player_y + move_speed * math.cos(player_angle)
             if can_move(nx, player_y): player_x = nx
             if can_move(player_x, ny): player_y = ny
+        if enemy_shoot_timer > 0:
+            enemy_shoot_timer -= 1
+        else:
+            enemy_state = "idle"
 
     # ---------------- RENDER ----------------
     screen.fill((0, 0, 0))
@@ -1339,6 +1362,10 @@ while running:
             current_gun = gun_shoot_img
         else:
             current_gun = gun_idle_img
+        if enemy_state == "shoot":
+            current_enemy = enemy_shoot_img
+        else:
+            current_enemy = enemy_img
 
         scale = WIDTH // 400
         gun_scaled = pygame.transform.scale(current_gun, (
