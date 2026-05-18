@@ -109,6 +109,12 @@ current_enemy4 = enemy4_img
 current_enemy5 = enemy5_img
 current_finalenemy = finalenemy_img
 enemy_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
+enemy1_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
+enemy2_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
+enemy3_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
+enemy4_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
+enemy5_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
+finalenemy_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
 
 # ---------------- SETTINGS ----------------
 FOV = math.pi / 3
