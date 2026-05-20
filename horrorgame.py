@@ -87,6 +87,7 @@ display_hp = 1000
 # ---------------- TEXTURE ----------------
 wall_texture = pygame.image.load("./img/bwall.png").convert()
 tex_width, tex_height = wall_texture.get_size()
+enemy_img = pygame.image.load("./img/ghost.png").convert_alpha()
 enemy1_img = pygame.image.load("./img/ZOMBE1.png").convert_alpha()
 enemy2_img = pygame.image.load("./img/enemy2.png").convert_alpha()
 enemy3_img = pygame.image.load("./img/org.png").convert_alpha()
@@ -96,6 +97,7 @@ finalenemy_img = pygame.image.load("./img/finalboss.png").convert_alpha()
 door_texture = pygame.image.load("./img/wood_door_01.png").convert()
 gun_idle_img = pygame.image.load("./img/gun.png").convert_alpha()
 gun_shoot_img = pygame.image.load("./img/shoot.png").convert_alpha()
+locked_texture = pygame.image.load("./img/wall.png").convert_alpha()
 current_gun = gun_idle_img
 wall_w, wall_h = wall_texture.get_size()
 door_w, door_h = door_texture.get_size()
@@ -106,6 +108,7 @@ current_enemy3 = enemy3_img
 current_enemy4 = enemy4_img
 current_enemy5 = enemy5_img
 current_finalenemy = finalenemy_img
+enemy_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
 enemy1_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
 enemy2_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
 enemy3_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
@@ -442,7 +445,6 @@ def shoot():
 
             if enemy_hp <= 0:
                 enemy_alive = False
-                unlock_next_door((3, 15))
                 print("ENEMY DEAD")
     else:
 
@@ -472,7 +474,6 @@ def shoot():
 
             if enemy1_hp <= 0:
                 enemy1_alive = False
-                unlock_next_door((9, 15))
                 print("ENEMY DEAD")
     if enemy2_alive:
         dx = enemy2_x - player_x
