@@ -108,13 +108,13 @@ current_enemy3 = enemy3_img
 current_enemy4 = enemy4_img
 current_enemy5 = enemy5_img
 current_finalenemy = finalenemy_img
-enemy_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
-enemy1_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
-enemy2_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
-enemy3_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
-enemy4_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
-enemy5_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
-finalenemy_shoot_img = pygame.image.load("./img/ZOMBA1.png").convert_alpha()
+enemy_shoot_img = pygame.image.load("./img/ZOMBE1.png").convert_alpha()
+enemy1_shoot_img = pygame.image.load("./img/ZOMBE1.png").convert_alpha()
+enemy2_shoot_img = pygame.image.load("./img/ZOMBE1.png").convert_alpha()
+enemy3_shoot_img = pygame.image.load("./img/ZOMBE1.png").convert_alpha()
+enemy4_shoot_img = pygame.image.load("./img/ZOMBE1.png").convert_alpha()
+enemy5_shoot_img = pygame.image.load("./img/ZOMBE1.png").convert_alpha()
+finalenemy_shoot_img = pygame.image.load("./img/ZOMBE1.png").convert_alpha()
 
 # ---------------- SETTINGS ----------------
 FOV = math.pi / 3
@@ -206,12 +206,12 @@ textures = {
 }
 
 locked_walls = {
-    "enemy": (5, 5),       # Ha meghal az enemy, az (5,5) koordinátán lévő 3-as ajtó 2-es lesz
-    "enemy1_2": (7, 4),    # Ha enemy1 ÉS enemy2 meghal, a (7,4) ajtó megnyílik
-    "enemy3": (7, 7),      # Stb...
-    "enemy4": (11, 4),
-    "enemy5": (11, 7),
-    "final": (15, 4)       # Az utolsó kapu a boss előtt
+    "enemy": (5, 5),
+    "enemy1_2": (7, 4),
+    "enemy3": (7, 7),
+    "enemy4": (10, 4),
+    "enemy5": (10, 7),
+    "final": (10, 15)
 }
 
 def check_locked_doors():
@@ -922,7 +922,7 @@ def draw_hp_bar():
     pygame.draw.rect(screen, (40, 40, 40), (x, y, bar_width, bar_height))
 
     # hp arány FIX maximumhoz
-    hp_ratio = player_hp / display_hp
+    hp_ratio = player_hp / player_max_hp
 
     # ne mehessen 100% fölé
     hp_ratio = min(hp_ratio, 1)
@@ -1345,26 +1345,22 @@ while running:
     # ---------------- GAME ----------------
     if game_state == "game":
         # ----------------- AJTÓK FELOLDÁSA ELLENSÉGEK ALAPJÁN -----------------
-        # 1. zóna: Sima 'enemy' halála után a középső 3-as ajtó kinyithatóvá válik
         if not enemy_alive and world_map[5][5] == 3:
             world_map[5][5] = 2
-            print("Az 1. ajtó feloldva! (3 -> 2)")
 
-        # 2. zóna: Ha enemy1 és enemy2 is halott, az alsóbb ajtók nyílnak
+
         if not enemy1_alive and not enemy2_alive:
             if world_map[7][4] == 3: world_map[7][4] = 2
             if world_map[7][7] == 3: world_map[7][7] = 2
 
-        # 3. zóna: Ha enemy3 halott
         if not enemy3_alive:
             if world_map[11][4] == 3: world_map[11][4] = 2
             if world_map[11][7] == 3: world_map[11][7] = 2
 
-        # 4. zóna: Ha enemy4 és enemy5 halott
         if not enemy4_alive and not enemy5_alive:
             if world_map[15][4] == 3: world_map[15][4] = 2
             if world_map[15][7] == 3: world_map[15][7] = 2
-        # ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
         # Update door animations
         update_doors()
 
