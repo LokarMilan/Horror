@@ -26,7 +26,7 @@ world_map = np.array([
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
-    [1, 0, 0, 0, 3, 0, 0, 2, 0, 0, 0, 1],
+    [1, 0, 0, 0, 3, 0, 0, 3, 0, 0, 0, 1],
     [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1],
@@ -205,57 +205,63 @@ textures = {
     3: locked_texture,
 }
 
+
 locked_walls = {
-    "enemy": (5, 5),
-    "enemy1_2": (7, 4),
-    "enemy3": (7, 7),
-    "enemy4": (10, 4),
-    "enemy5": (10, 7),
-    "final": (10, 15)
+    "enemy": (7, 15),       # Az első ajtó középen fent
+    "enemy1_2": (4, 11),    # Második szakasz ajtaja
+    "enemy3": (7, 11),     # Harmadik szakasz ajtaja
+    "enemy4": (4, 7),     # Negyedik szakasz ajtaja
+    "enemy5": (7, 7),     # Jobb oldali elágazás ajtaja
+    "final": (5, 5)        # Utolsó előtti szakasz ajtaja
 }
+
+
+
 
 def check_locked_doors():
     global world_map
     
-    # 1. Első enemy halála -> (5, 5) helyen lévő ajtó megnyílik
+    # 1. Első enemy halála
     if not enemy_alive:
         x, y = locked_walls["enemy"]
         if world_map[y][x] == 3:
             world_map[y][x] = 2  # Átváltjuk nyitható ajtóvá
-            print("Az (5,5) ajtó zárja kioldott!")
+            print(f"Az ajtó zárja kioldott a(z) ({x},{y}) koordinátán!")
 
-    # 2. Enemy1 ÉS Enemy2 halála -> (7, 4) ajtó megnyílik
-    if not enemy1_alive and not enemy2_alive:
+    # 2. Enemy1 ÉS Enemy2 halála
+    if not enemy2_alive:
         x, y = locked_walls["enemy1_2"]
         if world_map[y][x] == 3:
             world_map[y][x] = 2
-            print("A (7,4) ajtó zárja kioldott!")
+            print(f"Az ajtó zárja kioldott a(z) ({x},{y}) koordinátán!")
 
-    # 3. Enemy3 halála -> (7, 7) ajtó megnyílik
+    # 3. Enemy3 halála
     if not enemy3_alive:
         x, y = locked_walls["enemy3"]
         if world_map[y][x] == 3:
             world_map[y][x] = 2
+            print(f"Az ajtó zárja kioldott a(z) ({x},{y}) koordinátán!")
 
-    # 4. Enemy4 halála -> (11, 4) ajtó megnyílik
+    # 4. Enemy4 halála
     if not enemy4_alive:
         x, y = locked_walls["enemy4"]
         if world_map[y][x] == 3:
             world_map[y][x] = 2
+            print(f"Az ajtó zárja kioldott a(z) ({x},{y}) koordinátán!")
 
-    # 5. Enemy5 halála -> (11, 7) ajtó megnyílik
+    # 5. Enemy5 halála
     if not enemy5_alive:
         x, y = locked_walls["enemy5"]
         if world_map[y][x] == 3:
             world_map[y][x] = 2
+            print(f"Az ajtó zárja kioldott a(z) ({x},{y}) koordinátán!")
 
-    # 6. Final boss halála -> (15, 4) ajtó megnyílik
+    # 6. Final boss halála
     if not finalenemy_alive:
         x, y = locked_walls["final"]
         if world_map[y][x] == 3:
             world_map[y][x] = 2
-
-
+            print(f"Az ajtó zárja kioldott a(z) ({x},{y}) koordinátán!")
 def cast_rays():
     global z_buffer
     z_buffer = [float("inf")] * WIDTH
