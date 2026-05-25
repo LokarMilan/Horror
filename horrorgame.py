@@ -207,61 +207,34 @@ textures = {
 
 
 locked_walls = {
-    "enemy": (7, 15),       # Az első ajtó középen fent
-    "enemy1_2": (4, 11),    # Második szakasz ajtaja
-    "enemy3": (7, 11),     # Harmadik szakasz ajtaja
-    "enemy4": (4, 7),     # Negyedik szakasz ajtaja
-    "enemy5": (7, 7),     # Jobb oldali elágazás ajtaja
-    "final": (5, 5)        # Utolsó előtti szakasz ajtaja
+    "enemy":       (4, 15),   # bal alsó
+    "enemy1":      (7, 15),   # jobb alsó
+    "enemy2":      (4, 11),   # bal közép
+    "enemy3":      (7, 11),   # jobb közép
+    "enemy4":      (4,  7),   # bal felső
+    "enemy5":      (7,  7),   # jobb felső
+    "final_left":  (5,  5),   # boss ajtó bal
+    "final_right": (6,  5),   # boss ajtó jobb
 }
-
-
 
 
 def check_locked_doors():
     global world_map
-    
-    # 1. Első enemy halála
-    if not enemy_alive:
-        x, y = locked_walls["enemy"]
-        if world_map[y][x] == 3:
-            world_map[y][x] = 2  # Átváltjuk nyitható ajtóvá
-            print(f"Az ajtó zárja kioldott a(z) ({x},{y}) koordinátán!")
 
-    # 2. Enemy1 ÉS Enemy2 halála
-    if not enemy2_alive:
-        x, y = locked_walls["enemy1_2"]
+    def unlock(key):
+        x, y = locked_walls[key] 
         if world_map[y][x] == 3:
             world_map[y][x] = 2
-            print(f"Az ajtó zárja kioldott a(z) ({x},{y}) koordinátán!")
+            print(f"Ajtó kinyílt: ({x},{y})")
 
-    # 3. Enemy3 halála
-    if not enemy3_alive:
-        x, y = locked_walls["enemy3"]
-        if world_map[y][x] == 3:
-            world_map[y][x] = 2
-            print(f"Az ajtó zárja kioldott a(z) ({x},{y}) koordinátán!")
-
-    # 4. Enemy4 halála
-    if not enemy4_alive:
-        x, y = locked_walls["enemy4"]
-        if world_map[y][x] == 3:
-            world_map[y][x] = 2
-            print(f"Az ajtó zárja kioldott a(z) ({x},{y}) koordinátán!")
-
-    # 5. Enemy5 halála
-    if not enemy5_alive:
-        x, y = locked_walls["enemy5"]
-        if world_map[y][x] == 3:
-            world_map[y][x] = 2
-            print(f"Az ajtó zárja kioldott a(z) ({x},{y}) koordinátán!")
-
-    # 6. Final boss halála
-    if not finalenemy_alive:
-        x, y = locked_walls["final"]
-        if world_map[y][x] == 3:
-            world_map[y][x] = 2
-            print(f"Az ajtó zárja kioldott a(z) ({x},{y}) koordinátán!")
+    if not enemy_alive:        unlock("enemy1")
+    if not enemy1_alive:       unlock("enemy2")
+    if not enemy2_alive:       unlock("enemy3")
+    if not enemy3_alive:       unlock("enemy4")
+    if not enemy4_alive:       unlock("enemy5")
+    if not enemy5_alive:       
+        unlock("final_left")
+        unlock("final_right")
 def cast_rays():
     global z_buffer
     z_buffer = [float("inf")] * WIDTH
@@ -718,8 +691,8 @@ def melee_attack():
             finalenemy_hp -= 50
             print("MELEE HIT", finalenemy_hp)
 
-            if enemy1_hp <= 0:
-                enemy1_alive = False
+            if finalenemy_hp <= 0:
+                finalenemy_alive = False
                 print("ENEMY DEAD")
 
 
@@ -1044,10 +1017,11 @@ def enemy_attack():
                     if player_hp <= 0:
                         death()
                         print("Game Over!")
-                    enemy_attack_cooldown = 90
+                    
                     print("Az enemy eltalált!")
                 else:
                     print("Az enemy nem talált el!")
+                enemy_attack_cooldown = 90
     if not enemy_alive:
         if not enemy_morehp:
             print("Max HP 300!")
@@ -1080,10 +1054,11 @@ def enemy1_attack():
                     if player_hp <= 0:
                         death()
                         print("Game Over!")
-                    enemy1_attack_cooldown = 30 
+                    
                     print("Az enemy eltalált!")
                 else:
                     print("Az enemy nem talált el!")
+                enemy1_attack_cooldown = 30 
     if not enemy1_alive:
         if not enemy1_morehp:
             print("Max HP 300!")
@@ -1116,10 +1091,10 @@ def enemy2_attack():
                     if player_hp <= 0:
                         death()
                         print("Game Over!")
-                    enemy2_attack_cooldown = 30 
                     print("Az enemy eltalált!")
                 else:
                     print("Az enemy nem talált el!")
+                enemy2_attack_cooldown = 30 
     if not enemy2_alive:
         if not enemy2_morehp:
             print("Max HP 300!")
@@ -1151,10 +1126,10 @@ def enemy3_attack():
                     if player_hp <= 0:
                         death()
                         print("Game Over!")
-                    enemy3_attack_cooldown = 30 
-                    print("Az enemy eltalált!")
+                
                 else:
                     print("Az enemy nem talált el!")
+                enemy3_attack_cooldown = 30
     if not enemy3_alive:
         if not enemy3_morehp:
             print("Max HP 300!")
@@ -1186,10 +1161,11 @@ def enemy4_attack():
                     if player_hp <= 0:
                         death()
                         print("Game Over!")
-                    enemy4_attack_cooldown = 30 
+                    
                     print("Az enemy eltalált!")
                 else:
                     print("Az enemy nem talált el!")
+                enemy4_attack_cooldown = 20
     if not enemy4_alive:
         if not enemy4_morehp:
             print("Max HP 300!")
@@ -1222,10 +1198,11 @@ def enemy5_attack():
                     if player_hp <= 0:
                         death()
                         print("Game Over!")
-                    enemy5_attack_cooldown = 30 
+                    
                     print("Az enemy eltalált!")
                 else:
                     print("Az enemy nem talált el!")
+                enemy5_attack_cooldown = 30 
     if not enemy5_alive:
         if not enemy5_morehp:
             print("Max HP 300!")
@@ -1257,10 +1234,11 @@ def finalenemy_attack():
                     if player_hp <= 0:
                         death()
                         print("Game Over!")
-                    finalenemy_attack_cooldown = 30 
+                    
                     print("Az enemy eltalált!")
                 else:
                     print("Az enemy nem talált el!")
+                finalenemy_attack_cooldown = 30 
     # Csökkentjük a cooldown-t
     if finalenemy_attack_cooldown > 0:
         finalenemy_attack_cooldown -= 1
@@ -1350,23 +1328,7 @@ while running:
 
     # ---------------- GAME ----------------
     if game_state == "game":
-        # ----------------- AJTÓK FELOLDÁSA ELLENSÉGEK ALAPJÁN -----------------
-        if not enemy_alive and world_map[5][5] == 3:
-            world_map[5][5] = 2
 
-
-        if not enemy1_alive and not enemy2_alive:
-            if world_map[7][4] == 3: world_map[7][4] = 2
-            if world_map[7][7] == 3: world_map[7][7] = 2
-
-        if not enemy3_alive:
-            if world_map[11][4] == 3: world_map[11][4] = 2
-            if world_map[11][7] == 3: world_map[11][7] = 2
-
-        if not enemy4_alive and not enemy5_alive:
-            if world_map[15][4] == 3: world_map[15][4] = 2
-            if world_map[15][7] == 3: world_map[15][7] = 2
-# ----------------------------------------------------------------------
         # Update door animations
         update_doors()
 
