@@ -16,11 +16,17 @@ death_alpha = 0
 death_bg = None
 exit_button_rect = pygame.Rect(0, 0, 0, 0)
 
+# ---------------- MENU ----------------
+menu_alpha = 0
+menu_tick = 0
+menu_button_rects = []
+menu_music_started = False
+
 WIDTH, HEIGHT = 720,480
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
-pygame.mouse.set_visible(False)
-pygame.event.set_grab(True)
+pygame.mouse.set_visible(True)
+pygame.event.set_grab(False)
 
 # ---------------- MAP ----------------
 world_map = np.array([
@@ -1019,6 +1025,109 @@ def death():
     death_bg = snapshot
 
 
+def draw_menu():
+    global menu_alpha, menu_tick, selected, menu_button_rects
+
+    menu_tick += 1
+
+    # Fade in
+    if menu_alpha < 255:
+        menu_alpha = min(255, menu_alpha + 3)
+
+    # Vörös sarok vignette
+    vignette = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+    for cx, cy in [(0, 0), (WIDTH, 0), (0, HEIGHT), (WIDTH, HEIGHT)]:
+        for r in range(300, 0, -10):
+            t = r / 300
+            a = int(160 * (t ** 1.5))
+            pygame.draw.circle(vignette, (55, 0, 0, a), (cx, cy), r)
+    screen.blit(vignette, (0, 0))
+
+    # Scanline effekt
+    for y in range(0, HEIGHT, 4):
+        scan = pygame.Surface((WIDTH, 2), pygame.SRCALPHA)
+        scan.fill((0, 0, 0, 35))
+        screen.blit(scan, (0, y))
+
+    # Pulzáló cím
+    title_pulse = int(math.sin(menu_tick * 0.05) * 3)
+    try:
+        title_font = pygame.font.SysFont("impact", 70)
+    except Exception:
+        title_font = pygame.font.SysFont("arial", 70, bold=True)
+
+    ty = 45 + title_pulse
+    # Árnyék
+    t_shadow = title_font.render("HORROR DUNGEON", True, (12, 0, 0))
+    t_shadow.set_alpha(menu_alpha)
+    for ox, oy in [(-5, -5), (5, -5), (-5, 5), (5, 5)]:
+        screen.blit(t_shadow, (WIDTH // 2 - t_shadow.get_width() // 2 + ox, ty + oy))
+    # Fő cím
+    t_main = title_font.render("HORROR DUNGEON", True, (205, 10, 10))
+    t_main.set_alpha(menu_alpha)
+    screen.blit(t_main, (WIDTH // 2 - t_main.get_width() // 2, ty))
+
+    # Vízszintes elválasztó
+    div_y = ty + t_main.get_height() + 8
+    div = pygame.Surface((300, 2), pygame.SRCALPHA)
+    div.fill((160, 20, 20, menu_alpha))
+    screen.blit(div, (WIDTH // 2 - 150, div_y))
+
+    # Gombok
+    menu_button_rects.clear()
+    mx, my = pygame.mouse.get_pos()
+    labels = ["SINGLEPLAYER", "MULTIPLAYER", "EXIT"]
+    btn_w, btn_h, gap = 280, 52, 16
+    start_y = div_y + 18
+
+    try:
+        btn_font = pygame.font.SysFont("impact", 25)
+    except Exception:
+        btn_font = pygame.font.SysFont("arial", 22, bold=True)
+
+    for i, label in enumerate(labels):
+        btn_x = WIDTH // 2 - btn_w // 2
+        btn_y = start_y + i * (btn_h + gap)
+        rect = pygame.Rect(btn_x, btn_y, btn_w, btn_h)
+        menu_button_rects.append(rect)
+
+        hovering = rect.collidepoint(mx, my)
+        active = (i == selected)
+
+        # Gomb háttér
+        btn_surf = pygame.Surface((btn_w, btn_h), pygame.SRCALPHA)
+        if active or hovering:
+            btn_surf.fill((165, 15, 15, min(menu_alpha, 210)))
+        else:
+            btn_surf.fill((48, 5, 5, min(menu_alpha, 165)))
+        screen.blit(btn_surf, (btn_x, btn_y))
+
+        # Gomb keret
+        brd_surf = pygame.Surface((btn_w, btn_h), pygame.SRCALPHA)
+        brd_col = (235, 55, 55, menu_alpha) if (active or hovering) else (110, 18, 18, menu_alpha)
+        pygame.draw.rect(brd_surf, brd_col, (0, 0, btn_w, btn_h), 2)
+        screen.blit(brd_surf, (btn_x, btn_y))
+
+        # Bal oldali aktív jelző csík
+        if active:
+            bar = pygame.Surface((4, btn_h - 10), pygame.SRCALPHA)
+            bar.fill((235, 55, 55, menu_alpha))
+            screen.blit(bar, (btn_x + 6, btn_y + 5))
+
+        # Felirat
+        tcol = (255, 255, 255) if (active or hovering) else (195, 140, 140)
+        btn_label = btn_font.render(label, True, tcol)
+        btn_label.set_alpha(menu_alpha)
+        screen.blit(btn_label, (btn_x + btn_w // 2 - btn_label.get_width() // 2,
+                                 btn_y + btn_h // 2 - btn_label.get_height() // 2))
+
+    # Lábléc tipp
+    hint_font = pygame.font.SysFont("arial", 13)
+    hint = hint_font.render("↑↓ or mouse to navigate   •   ENTER or click to select", True, (110, 55, 55))
+    hint.set_alpha(min(menu_alpha, 150))
+    screen.blit(hint, (WIDTH // 2 - hint.get_width() // 2, HEIGHT - 26))
+
+
 def draw_death_screen():
     global death_alpha, exit_button_rect
 
@@ -1391,16 +1500,51 @@ while running:
 
                     if selected == 0:
                         game_state = "game"
+                        pygame.mouse.set_visible(False)
+                        pygame.event.set_grab(True)
+                        menu_music.stop()
+                        menu_music_started = False
+                        menu_alpha = 0
 
                     elif selected == 1:
                         game_state = "multiplayer"
+                        menu_music.stop()
+                        menu_music_started = False
 
                     elif selected == 2:
                         running = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                for i, rect in enumerate(menu_button_rects):
+                    if rect.collidepoint(event.pos):
+                        selected = i
+                        if i == 0:
+                            game_state = "game"
+                            pygame.mouse.set_visible(False)
+                            pygame.event.set_grab(True)
+                            menu_music.stop()
+                            menu_music_started = False
+                            menu_alpha = 0
+                        elif i == 1:
+                            game_state = "multiplayer"
+                            menu_music.stop()
+                            menu_music_started = False
+                        elif i == 2:
+                            running = False
+
+            if event.type == pygame.MOUSEMOTION:
+                for i, rect in enumerate(menu_button_rects):
+                    if rect.collidepoint(event.pos):
+                        selected = i
+
         elif game_state == "game":
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     game_state = "menu"
+                    pygame.mouse.set_visible(True)
+                    pygame.event.set_grab(False)
+                    menu_alpha = 0
+                    menu_music_started = False
 
                 if event.key == pygame.K_e:
                     front_x = int(player_x + math.cos(player_angle))
@@ -1498,15 +1642,10 @@ while running:
     screen.fill((0, 0, 0))
 
     if game_state == "menu":
-        menu_music.play()
-        for i, option in enumerate(menu_options):
-
-            color = (255, 255, 255)
-            if i == selected:
-                color = (255, 255, 0)
-
-            text = font.render(option, True, color)
-            screen.blit(text, (WIDTH // 2 - 100, HEIGHT // 2 + i * 40))
+        if not menu_music_started:
+            menu_music.play(-1)
+            menu_music_started = True
+        draw_menu()
 
     elif game_state == "game":
         menu_music.stop()
