@@ -22,6 +22,11 @@ menu_tick = 0
 menu_button_rects = []
 menu_music_started = False
 
+# ---------------- MULTIPLAYER SCREEN ----------------
+mp_alpha = 0
+mp_tick = 0
+mp_back_rect = pygame.Rect(0, 0, 0, 0)
+
 WIDTH, HEIGHT = 720,480
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
@@ -1214,6 +1219,133 @@ def draw_death_screen():
                                  btn_y + btn_h // 2 - btn_label.get_height() // 2))
 
 
+def draw_multiplayer_screen():
+    global mp_alpha, mp_tick, mp_back_rect
+
+    mp_tick += 1
+
+    # Fade in
+    if mp_alpha < 255:
+        mp_alpha = min(255, mp_alpha + 3)
+
+    # Vörös sarok vignette (identical to menu)
+    vignette = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+    for cx, cy in [(0, 0), (WIDTH, 0), (0, HEIGHT), (WIDTH, HEIGHT)]:
+        for r in range(300, 0, -10):
+            t = r / 300
+            a = int(160 * (t ** 1.5))
+            pygame.draw.circle(vignette, (55, 0, 0, a), (cx, cy), r)
+    screen.blit(vignette, (0, 0))
+
+    # Scanline effekt
+    for y in range(0, HEIGHT, 4):
+        scan = pygame.Surface((WIDTH, 2), pygame.SRCALPHA)
+        scan.fill((0, 0, 0, 35))
+        screen.blit(scan, (0, y))
+
+    # Halvány vörös grid háttér
+    if mp_alpha >= 50:
+        grid_alpha = min(40, int((mp_alpha - 50) * 0.5))
+        grid_surf = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        for gx in range(0, WIDTH, 40):
+            pygame.draw.line(grid_surf, (120, 10, 10, grid_alpha), (gx, 0), (gx, HEIGHT), 1)
+        for gy in range(0, HEIGHT, 40):
+            pygame.draw.line(grid_surf, (120, 10, 10, grid_alpha), (0, gy), (WIDTH, gy), 1)
+        screen.blit(grid_surf, (0, 0))
+
+    # Pulzáló "MULTIPLAYER" cím
+    title_pulse = int(math.sin(mp_tick * 0.05) * 3)
+    try:
+        title_font = pygame.font.SysFont("impact", 70)
+    except Exception:
+        title_font = pygame.font.SysFont("arial", 70, bold=True)
+
+    ty = 45 + title_pulse
+
+    # Árnyék
+    t_shadow = title_font.render("MULTIPLAYER", True, (12, 0, 0))
+    t_shadow.set_alpha(mp_alpha)
+    for ox, oy in [(-5, -5), (5, -5), (-5, 5), (5, 5)]:
+        screen.blit(t_shadow, (WIDTH // 2 - t_shadow.get_width() // 2 + ox, ty + oy))
+    # Fő cím
+    t_main = title_font.render("MULTIPLAYER", True, (205, 10, 10))
+    t_main.set_alpha(mp_alpha)
+    screen.blit(t_main, (WIDTH // 2 - t_main.get_width() // 2, ty))
+
+    # Vízszintes elválasztó
+    div_y = ty + t_main.get_height() + 8
+    div = pygame.Surface((300, 2), pygame.SRCALPHA)
+    div.fill((160, 20, 20, mp_alpha))
+    screen.blit(div, (WIDTH // 2 - 150, div_y))
+
+    # "COMING SOON" – pulzáló vörös szöveg
+    if mp_alpha >= 60:
+        cs_alpha = min(255, int((mp_alpha - 60) * 3))
+        try:
+            cs_font = pygame.font.SysFont("impact", 44)
+        except Exception:
+            cs_font = pygame.font.SysFont("arial", 44, bold=True)
+        pulse_r = int(185 + 20 * abs(math.sin(mp_tick * 0.04)))
+        cs_text = cs_font.render("COMING SOON", True, (pulse_r, 8, 8))
+        cs_text.set_alpha(cs_alpha)
+        screen.blit(cs_text, (WIDTH // 2 - cs_text.get_width() // 2, div_y + 28))
+
+    # Alcím
+    if mp_alpha >= 100:
+        sub_alpha = min(255, int((mp_alpha - 100) * 4))
+        sub_font = pygame.font.SysFont("arial", 15)
+        sub_text = sub_font.render("the darkness awaits... but not yet", True, (170, 90, 90))
+        sub_text.set_alpha(sub_alpha)
+        screen.blit(sub_text, (WIDTH // 2 - sub_text.get_width() // 2, div_y + 82))
+
+    # BACK TO MENU gomb
+    if mp_alpha >= 140:
+        btn_alpha = min(255, int((mp_alpha - 140) * 5))
+        btn_w, btn_h = 240, 52
+        btn_x = WIDTH // 2 - btn_w // 2
+        btn_y = HEIGHT // 2 + 80
+        mp_back_rect.update(btn_x, btn_y, btn_w, btn_h)
+
+        mx, my = pygame.mouse.get_pos()
+        hovering = mp_back_rect.collidepoint(mx, my)
+
+        try:
+            btn_font = pygame.font.SysFont("impact", 25)
+        except Exception:
+            btn_font = pygame.font.SysFont("arial", 22, bold=True)
+
+        # Gomb háttér
+        btn_surf = pygame.Surface((btn_w, btn_h), pygame.SRCALPHA)
+        fill_color = (165, 15, 15, min(btn_alpha, 210)) if hovering else (48, 5, 5, min(btn_alpha, 165))
+        btn_surf.fill(fill_color)
+        screen.blit(btn_surf, (btn_x, btn_y))
+
+        # Gomb keret
+        brd_surf = pygame.Surface((btn_w, btn_h), pygame.SRCALPHA)
+        brd_col = (235, 55, 55, btn_alpha) if hovering else (110, 18, 18, btn_alpha)
+        pygame.draw.rect(brd_surf, brd_col, (0, 0, btn_w, btn_h), 2)
+        screen.blit(brd_surf, (btn_x, btn_y))
+
+        # Bal oldali aktív jelző csík hover esetén
+        if hovering:
+            bar = pygame.Surface((4, btn_h - 10), pygame.SRCALPHA)
+            bar.fill((235, 55, 55, btn_alpha))
+            screen.blit(bar, (btn_x + 6, btn_y + 5))
+
+        # Gomb felirat
+        tcol = (255, 255, 255) if hovering else (195, 140, 140)
+        btn_label = btn_font.render("BACK TO MENU", True, tcol)
+        btn_label.set_alpha(btn_alpha)
+        screen.blit(btn_label, (btn_x + btn_w // 2 - btn_label.get_width() // 2,
+                                 btn_y + btn_h // 2 - btn_label.get_height() // 2))
+
+    # Lábléc tipp
+    hint_font = pygame.font.SysFont("arial", 13)
+    hint = hint_font.render("ESC or click to return to menu", True, (110, 55, 55))
+    hint.set_alpha(min(mp_alpha, 150))
+    screen.blit(hint, (WIDTH // 2 - hint.get_width() // 2, HEIGHT - 26))
+
+
 def enemy_attack():
     global enemy_attack_cooldown,player_hp,player_max_hp,enemy_morehp,enemy_state,enemy_shoot_timer
     attack_distance = 1.5  # támadás távolsága
@@ -1510,6 +1642,8 @@ while running:
                         game_state = "multiplayer"
                         menu_music.stop()
                         menu_music_started = False
+                        mp_alpha = 0
+                        mp_tick = 0
 
                     elif selected == 2:
                         running = False
@@ -1529,6 +1663,8 @@ while running:
                             game_state = "multiplayer"
                             menu_music.stop()
                             menu_music_started = False
+                            mp_alpha = 0
+                            mp_tick = 0
                         elif i == 2:
                             running = False
 
@@ -1576,6 +1712,13 @@ while running:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     game_state = "menu"
+                    menu_alpha = 0
+                    menu_music_started = False
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if mp_back_rect.collidepoint(event.pos):
+                    game_state = "menu"
+                    menu_alpha = 0
+                    menu_music_started = False
 
     # ---------------- LOGIKA ----------------
     if game_state == "menu":
@@ -1712,10 +1855,7 @@ while running:
             pygame.draw.circle(screen, (255, 255, 255), (WIDTH // 2, HEIGHT // 2), 8)
             shoot_flash -= 1
     if game_state == "multiplayer":
-        color = (255, 255, 255)
-        szoveg = "coming soon...."
-        text = font.render(szoveg, True, color)
-        screen.blit(text, (WIDTH // 2-150, HEIGHT // 2))
+        draw_multiplayer_screen()
 
     elif game_state == "dead":
         draw_death_screen()
