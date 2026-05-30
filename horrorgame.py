@@ -11,6 +11,11 @@ game_state = "menu"
 menu_options = ["singleplayer", "multiplayer", "exit"]
 selected = 0
 
+# ---------------- DEATH SCREEN ----------------
+death_alpha = 0
+death_bg = None
+exit_button_rect = pygame.Rect(0, 0, 0, 0)
+
 WIDTH, HEIGHT = 720,480
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
@@ -992,7 +997,113 @@ def draw_enemy_hp_bar(screen_x, size, hp, max_hp):
 
 
 def death():
-    pygame.quit()
+    global game_state, death_bg, death_alpha
+    if game_state == "dead":
+        return
+    game_state = "dead"
+    death_alpha = 0
+    pygame.mouse.set_visible(True)
+    pygame.event.set_grab(False)
+    # Freeze frame + grayscale konverzió
+    snapshot = pygame.Surface((WIDTH, HEIGHT))
+    snapshot.blit(screen, (0, 0))
+    try:
+        px = pygame.surfarray.pixels3d(snapshot)
+        gray = (px[:, :, 0] * 0.299 + px[:, :, 1] * 0.587 + px[:, :, 2] * 0.114).astype(np.uint8)
+        px[:, :, 0] = gray
+        px[:, :, 1] = gray
+        px[:, :, 2] = gray
+        del px
+    except Exception:
+        pass
+    death_bg = snapshot
+
+
+def draw_death_screen():
+    global death_alpha, exit_button_rect
+
+    # Fagyasztott szürkeárnyalatos háttér
+    if death_bg is not None:
+        screen.blit(death_bg, (0, 0))
+
+    # Alpha növelése
+    if death_alpha < 220:
+        death_alpha = min(death_alpha + 2, 220)
+
+    # Sötét vörös overlay (vignette)
+    overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+    overlay.fill((70, 0, 0, min(int(death_alpha * 0.65), 145)))
+    screen.blit(overlay, (0, 0))
+
+    # Scanline effekt (GTA-szerű)
+    if death_alpha > 40:
+        scan_alpha = min(80, int(death_alpha * 0.36))
+        for y in range(0, HEIGHT, 4):
+            scan_line = pygame.Surface((WIDTH, 2), pygame.SRCALPHA)
+            scan_line.fill((0, 0, 0, scan_alpha))
+            screen.blit(scan_line, (0, y))
+
+    # "YOU DIED" felirat
+    if death_alpha >= 70:
+        text_alpha = min(255, int((death_alpha - 70) * 5))
+        try:
+            death_font_big = pygame.font.SysFont("impact", 92)
+        except Exception:
+            death_font_big = pygame.font.SysFont("arial", 92, bold=True)
+
+        # Árnyék (GTA-stílusú)
+        shadow = death_font_big.render("YOU DIED", True, (15, 0, 0))
+        shadow.set_alpha(text_alpha)
+        for ox, oy in [(-5, -5), (5, -5), (-5, 5), (5, 5)]:
+            screen.blit(shadow, (WIDTH // 2 - shadow.get_width() // 2 + ox,
+                                  HEIGHT // 2 - shadow.get_height() // 2 - 50 + oy))
+
+        # Fő szöveg – mélyvörös
+        main_text = death_font_big.render("YOU DIED", True, (210, 10, 10))
+        main_text.set_alpha(text_alpha)
+        screen.blit(main_text, (WIDTH // 2 - main_text.get_width() // 2,
+                                 HEIGHT // 2 - main_text.get_height() // 2 - 50))
+
+    # Alcím
+    if death_alpha >= 120:
+        sub_alpha = min(255, int((death_alpha - 120) * 5))
+        sub_font = pygame.font.SysFont("arial", 18)
+        sub_text = sub_font.render("you were consumed by the darkness", True, (170, 90, 90))
+        sub_text.set_alpha(sub_alpha)
+        screen.blit(sub_text, (WIDTH // 2 - sub_text.get_width() // 2,
+                                HEIGHT // 2 + 14))
+
+    # EXIT gomb
+    if death_alpha >= 155:
+        btn_alpha = min(255, int((death_alpha - 155) * 8))
+
+        btn_w, btn_h = 220, 52
+        btn_x = WIDTH // 2 - btn_w // 2
+        btn_y = HEIGHT // 2 + 55
+        exit_button_rect = pygame.Rect(btn_x, btn_y, btn_w, btn_h)
+
+        mx, my = pygame.mouse.get_pos()
+        hovering = exit_button_rect.collidepoint(mx, my)
+
+        # Gomb háttér
+        btn_surf = pygame.Surface((btn_w, btn_h), pygame.SRCALPHA)
+        fill_color = (185, 20, 20, btn_alpha) if hovering else (90, 8, 8, btn_alpha)
+        btn_surf.fill(fill_color)
+        screen.blit(btn_surf, (btn_x, btn_y))
+
+        # Gomb keret
+        brd_surf = pygame.Surface((btn_w, btn_h), pygame.SRCALPHA)
+        border_color = (240, 60, 60, btn_alpha) if hovering else (190, 35, 35, btn_alpha)
+        pygame.draw.rect(brd_surf, border_color, (0, 0, btn_w, btn_h), 2)
+        screen.blit(brd_surf, (btn_x, btn_y))
+
+        # Gomb szöveg
+        btn_font = pygame.font.SysFont("arial", 22, bold=True)
+        btn_label = btn_font.render("EXIT GAME", True, (255, 255, 255))
+        btn_label.set_alpha(btn_alpha)
+        screen.blit(btn_label, (btn_x + btn_w // 2 - btn_label.get_width() // 2,
+                                 btn_y + btn_h // 2 - btn_label.get_height() // 2))
+
 
 def enemy_attack():
     global enemy_attack_cooldown,player_hp,player_max_hp,enemy_morehp,enemy_state,enemy_shoot_timer
@@ -1256,10 +1367,15 @@ while running:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
-                shoot()
+                if game_state == "game":
+                    shoot()
+                elif game_state == "dead":
+                    if exit_button_rect.collidepoint(event.pos):
+                        running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_f:
-                melee_attack()
+                if game_state == "game":
+                    melee_attack()
 
         if game_state == "menu":
 
@@ -1461,6 +1577,9 @@ while running:
         szoveg = "coming soon...."
         text = font.render(szoveg, True, color)
         screen.blit(text, (WIDTH // 2-150, HEIGHT // 2))
+
+    elif game_state == "dead":
+        draw_death_screen()
 
     pygame.display.flip()
 
